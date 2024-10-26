@@ -157,6 +157,40 @@ public:
         }
     }
 
+    Ticket *getTicketById(int id)
+    {
+        TicketNode *current = head;
+
+        while (current != NULL)
+        {
+            if (current->ticket.id == id)
+            {
+                return &current->ticket;
+            }
+
+            current = current->next;
+        }
+
+        return NULL;
+    }
+
+    Ticket *getTicketByCustomerName(string customerName)
+    {
+        TicketNode *current = head;
+
+        while (current != NULL)
+        {
+            if (current->ticket.customerName == customerName)
+            {
+                return &current->ticket;
+            }
+
+            current = current->next;
+        }
+
+        return NULL;
+    }
+
     void bubbleSort(string sortBy)
     {
         if (head == tail || head == NULL)
