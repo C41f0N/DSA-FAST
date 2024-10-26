@@ -205,25 +205,122 @@ public:
             }
         }
     }
+
+    void insertionSort(string sortBy)
+    {
+
+        TicketNode *current = head;
+
+        while (current != NULL)
+        {
+
+            Ticket key(current->ticket);
+
+            TicketNode *j = current;
+            bool condition = false;
+
+            if (sortBy == "priority" && j->prev != NULL)
+            {
+                condition = j->prev->ticket.priority > key.priority;
+            }
+            else if (sortBy == "creationTime" && j->prev != NULL)
+            {
+                condition = j->prev->ticket.creationTime > key.creationTime;
+            }
+            else if (sortBy == "customerName" && j->prev != NULL)
+            {
+                condition = j->prev->ticket.customerName > key.customerName;
+            }
+
+            while (j->prev != NULL && condition)
+            {
+
+                j->ticket = j->prev->ticket;
+                j = j->prev;
+
+                condition = false;
+
+                if (sortBy == "priority" && j->prev != NULL)
+                {
+                    condition = j->prev->ticket.priority > key.priority;
+                }
+                else if (sortBy == "creationTime" && j->prev != NULL)
+                {
+                    condition = j->prev->ticket.creationTime > key.creationTime;
+                }
+                else if (sortBy == "customerName" && j->prev != NULL)
+                {
+                    condition = j->prev->ticket.customerName > key.customerName;
+                }
+            }
+
+            j->ticket = key;
+
+            current = current->next;
+        }
+    }
+
+    void selectionSort(string sortBy)
+    {
+
+        TicketNode *i = head;
+
+        while (i != NULL)
+        {
+            TicketNode *current = i;
+            TicketNode *minimum = i;
+
+            while (current != NULL)
+            {
+                bool condition = false;
+
+                if (sortBy == "priority")
+                {
+                    condition = current->ticket.priority > minimum->ticket.priority;
+                }
+                else if (sortBy == "creationTime")
+                {
+                    condition = current->ticket.creationTime > minimum->ticket.creationTime;
+                }
+                else if (sortBy == "customerName")
+                {
+                    condition = current->ticket.customerName > minimum->ticket.customerName;
+                }
+
+                if (condition)
+                {
+                    minimum = current;
+                }
+
+                Ticket temp(minimum->ticket);
+                minimum->ticket = current->ticket;
+                current->ticket = temp;
+
+                current = current->next;
+            }
+
+            i = i->next;
+        }
+    }
 };
 
 int main()
 {
+    Ticket ticket1(2, "S1arim Ahmed", 1, "A request");
     Ticket ticket3(1, "S2arim Ahmed", 1, "A request");
     Ticket ticket2(4, "S3arim Ahmed", 1, "A request");
     Ticket ticket4(8, "S4arim Ahmed", 1, "A request");
-    Ticket ticket1(2, "S1arim Ahmed", 1, "A request");
 
     TicketLL ll;
 
     ticket4.close();
 
     ll.addTicket(ticket2);
+    ll.addTicket(ticket3);
     ll.addTicket(ticket1);
     ll.addTicket(ticket4);
-    ll.addTicket(ticket3);
 
-    ll.bubbleSort("customerName");
+    ll.selectionSort("customerName");
 
     // ll.removeTicket(1);
     // ll.removeTicket(2);
