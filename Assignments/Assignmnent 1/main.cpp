@@ -718,6 +718,78 @@ public:
             data[j] = key;
         }
     }
+
+    void merge(int left, int mid, int right)
+    {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+
+        Agent *leftArray = new Agent[n1];
+        Agent *rightArray = new Agent[n2];
+
+        for (int i = 0; i < n1; i++)
+        {
+            leftArray[i] = data[left + i];
+        }
+
+        for (int i = 0; i < n2; i++)
+        {
+            rightArray[i] = data[mid + i + 1];
+        }
+
+        int i = 0, j = 0, k = left;
+
+        while (i < n1 && j < n2)
+        {
+            if (leftArray[i].numTicketsAssigned <= rightArray[j].numTicketsAssigned)
+            {
+                data[k] = leftArray[i];
+                i++;
+                k++;
+            }
+            else
+            {
+                data[k] = rightArray[j];
+                j++;
+                k++;
+            }
+        }
+
+        while (i < n1)
+        {
+            data[k] = leftArray[i];
+            i++;
+            k++;
+        }
+
+        while (j < n2)
+        {
+            data[k] = rightArray[j];
+            j++;
+            k++;
+        }
+
+        delete[] leftArray;
+        delete[] rightArray;
+    }
+
+    void ms(int left, int right)
+    {
+        if (left < right)
+        {
+
+            int mid = left + (right - left) / 2;
+
+            ms(left, mid);
+            ms(mid + 1, right);
+            merge(left, mid, right);
+        }
+    }
+
+    void mergeSort()
+    {
+        ms(0, length - 1);
+    }
 };
 
 int main()
@@ -763,7 +835,7 @@ int main()
     agents.addAgent(agent2);
     agents.addAgent(agent1);
 
-    agents.insertionSort();
+    agents.mergeSort();
 
     agents.print();
 
