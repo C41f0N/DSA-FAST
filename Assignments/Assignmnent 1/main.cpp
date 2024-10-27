@@ -790,6 +790,51 @@ public:
     {
         ms(0, length - 1);
     }
+
+    int partition(int left, int right)
+    {
+        int pivot = right;
+
+        if (right <= left)
+        {
+            return left;
+        }
+
+        int i = left - 1;
+
+        for (int j = left; j < right; j++)
+        {
+            if (data[j].numTicketsAssigned > data[pivot].numTicketsAssigned)
+            {
+                i++;
+
+                Agent temp(data[i]);
+                data[i] = data[j];
+                data[j] = temp;
+            }
+        }
+
+        Agent temp(data[pivot]);
+        data[pivot] = data[i + 1];
+        data[i + 1] = temp;
+
+        return i + 1;
+    }
+
+    void qs(int left, int right)
+    {
+        if (left < right)
+        {
+            int pi = partition(left, right);
+            qs(left, pi - 1);
+            qs(pi + 1, right);
+        }
+    }
+
+    void quickSort()
+    {
+        qs(0, length - 1);
+    }
 };
 
 int main()
@@ -835,7 +880,7 @@ int main()
     agents.addAgent(agent2);
     agents.addAgent(agent1);
 
-    agents.mergeSort();
+    agents.quickSort();
 
     agents.print();
 
