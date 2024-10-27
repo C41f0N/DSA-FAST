@@ -449,6 +449,90 @@ public:
         qs(tickets, 0, length - 1);
 
         fromArray(tickets, length);
+        delete[] tickets;
+    }
+
+    void merge(Ticket *tickets, int left, int mid, int right)
+    {
+        if (left == right)
+        {
+            return;
+        }
+
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+
+        Ticket *leftArray = new Ticket[n1];
+        Ticket *rightArray = new Ticket[n2];
+
+        for (int i = 0; i < n1; i++)
+        {
+            leftArray[i] = tickets[left + i];
+        }
+
+        for (int i = 0; i < n2; i++)
+        {
+            rightArray[i] = tickets[mid + 1 + i];
+        }
+
+        int i = 0, j = 0, k = left;
+        while (i < n1 && j < n2)
+        {
+            if (leftArray[i].id <= rightArray[j].id)
+            {
+                tickets[k] = leftArray[i];
+                i++;
+                k++;
+            }
+            else
+
+            {
+                tickets[k] = rightArray[j];
+                j++;
+                k++;
+            }
+        }
+
+        while (i < n1)
+        {
+            tickets[k] = leftArray[i];
+            i++;
+            k++;
+        }
+
+        while (j < n2)
+        {
+            tickets[k] = rightArray[j];
+            j++;
+            k++;
+        }
+
+        delete[] leftArray;
+        delete[] rightArray;
+    }
+
+    void ms(Ticket *tickets, int left, int right)
+    {
+        if (left < right)
+        {
+            int mid = left + (right - left) / 2;
+
+            ms(tickets, left, mid);
+            ms(tickets, mid + 1, right);
+            merge(tickets, left, mid, right);
+        }
+    }
+
+    void mergeSort()
+    {
+
+        Ticket *tickets = toArray();
+        int length = getLength();
+
+        ms(tickets, 0, length - 1);
+
+        fromArray(tickets, length);
+        delete[] tickets;
     }
 };
 
@@ -480,7 +564,7 @@ int main()
     ll.addTicket(ticket9);
     ll.addTicket(ticket10);
 
-    ll.quickSort();
+    // ll.mergeSort();
 
     // ll.removeTicket(1);
     // ll.removeTicket(2);
