@@ -19,16 +19,17 @@ public:
     Ticket() {}
 
     Ticket(
-        int id,
         string customerName,
         int priority,
         string requestDescription)
-        : id(id),
-          customerName(customerName),
+        : customerName(customerName),
           priority(priority),
           requestDescription(requestDescription),
           creationTime(chrono::system_clock::now()),
-          isOpen(true) {}
+          isOpen(true)
+    {
+        id = rand() % 10000;
+    }
 
     time_t getTime()
     {
@@ -616,6 +617,7 @@ class Agent
 public:
     int id;
     string name;
+    string type;
     int numTicketsAssigned;
     Ticket *assignedTickets[5];
     bool available;
@@ -623,12 +625,15 @@ public:
     Agent() {}
 
     Agent(
-        int id,
-        string name)
-        : id(id),
-          name(name),
+        string name,
+        string type)
+        : name(name),
+          type(type),
           numTicketsAssigned(0),
-          available(true) {}
+          available(true)
+    {
+        id = rand() % 10000;
+    }
 
     void print()
     {
@@ -636,16 +641,16 @@ public:
         cout << "Agent Name: " << name << endl;
         cout << "Total Tickets Assigned: " << numTicketsAssigned << endl
              << endl;
-        // for (int i = 0; i < numTicketsAssigned; i++)
-        // {
-        //     cout << "Ticket#" << i << endl;
-        //     assignedTickets[i]->print();
-        // }
+        for (int i = 0; i < numTicketsAssigned; i++)
+        {
+            cout << "Ticket#" << i << endl;
+            assignedTickets[i]->print();
+        }
     }
 
     void assignTicket(Ticket *ticket)
     {
-        if (numTicketsAssigned < 5)
+        if (available)
         {
             assignedTickets[numTicketsAssigned] = ticket;
             numTicketsAssigned++;
@@ -656,12 +661,36 @@ public:
             }
         }
     }
+
+    // Resolves the first assigned ticket
+    Ticket *resolveTicket()
+    {
+        if (numTicketsAssigned > 0)
+        {
+            Ticket *resolvedTicket = assignedTickets[0];
+
+            numTicketsAssigned--;
+
+            // Push all tickets one step back
+            for (int i = 1; i < 5; i++)
+            {
+                assignedTickets[i - 1] = assignedTickets[i];
+            }
+
+            assignedTickets[4] = NULL;
+
+            available = true;
+            return resolvedTicket;
+        }
+
+        return NULL;
+    }
 };
 
 class AgentArray
 {
 public:
-    Agent *data;
+    Agent **data;
     int capacity;
     int length;
 
@@ -669,19 +698,19 @@ public:
         : capacity(1),
           length(0)
     {
-        data = new Agent[capacity];
+        data = new Agent *[capacity];
     }
 
     void print()
     {
         for (int i = 0; i < length; i++)
         {
-            data[i].print();
+            data[i]->print();
             cout << endl;
         }
     }
 
-    void addAgent(Agent agent)
+    void addAgent(Agent *agent)
     {
 
         length++;
@@ -691,7 +720,7 @@ public:
             // Update array capacity
             capacity *= 2;
 
-            Agent *newData = new Agent[capacity];
+            Agent **newData = new Agent *[capacity];
 
             // Copy old data
             for (int i = 0; i < length - 1; i++)
@@ -706,15 +735,42 @@ public:
         data[length - 1] = agent;
     }
 
+    bool assignTicket(Ticket *ticket)
+    {
+        for (int i = 0; i < length; i++)
+        {
+            if (data[i]->available && data[i]->type == ticket->requestDescription)
+            {
+                data[i]->assignTicket(ticket);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    Ticket *resolveTicket()
+    {
+        for (int i = 0; i < length; i++)
+        {
+            if (data[i]->numTicketsAssigned > 0)
+            {
+                return data[i]->resolveTicket();
+            }
+        }
+
+        return NULL;
+    }
+
     void bubbleSort()
     {
         for (int i = 0; i < length; i++)
         {
             for (int j = 0; j < length - 1; j++)
             {
-                if (data[j].numTicketsAssigned > data[j + 1].numTicketsAssigned)
+                if (data[j]->numTicketsAssigned > data[j + 1]->numTicketsAssigned)
                 {
-                    Agent temp(data[j]);
+                    Agent *temp = data[j];
                     data[j] = data[j + 1];
                     data[j + 1] = temp;
                 }
@@ -730,7 +786,7 @@ public:
 
             for (int j = i + 1; j < length; j++)
             {
-                if (data[j].numTicketsAssigned < data[smallest].numTicketsAssigned)
+                if (data[j]->numTicketsAssigned < data[smallest]->numTicketsAssigned)
                 {
                     smallest = j;
                 }
@@ -738,7 +794,7 @@ public:
 
             if (i != smallest)
             {
-                Agent temp(data[smallest]);
+                Agent *temp = data[smallest];
                 data[smallest] = data[i];
                 data[i] = temp;
             }
@@ -749,10 +805,10 @@ public:
     {
         for (int i = 1; i < length; i++)
         {
-            Agent key = data[i];
+            Agent *key = data[i];
             int j = i;
 
-            while (j > 0 && data[j - 1].numTicketsAssigned > key.numTicketsAssigned)
+            while (j > 0 && data[j - 1]->numTicketsAssigned > key->numTicketsAssigned)
             {
                 data[j] = data[j - 1];
                 j--;
@@ -767,8 +823,8 @@ public:
         int n1 = mid - left + 1;
         int n2 = right - mid;
 
-        Agent *leftArray = new Agent[n1];
-        Agent *rightArray = new Agent[n2];
+        Agent **leftArray = new Agent *[n1];
+        Agent **rightArray = new Agent *[n2];
 
         for (int i = 0; i < n1; i++)
         {
@@ -784,7 +840,7 @@ public:
 
         while (i < n1 && j < n2)
         {
-            if (leftArray[i].numTicketsAssigned <= rightArray[j].numTicketsAssigned)
+            if (leftArray[i]->numTicketsAssigned <= rightArray[j]->numTicketsAssigned)
             {
                 data[k] = leftArray[i];
                 i++;
@@ -847,17 +903,17 @@ public:
 
         for (int j = left; j < right; j++)
         {
-            if (data[j].numTicketsAssigned > data[pivot].numTicketsAssigned)
+            if (data[j]->numTicketsAssigned > data[pivot]->numTicketsAssigned)
             {
                 i++;
 
-                Agent temp(data[i]);
+                Agent *temp = data[i];
                 data[i] = data[j];
                 data[j] = temp;
             }
         }
 
-        Agent temp(data[pivot]);
+        Agent *temp = data[pivot];
         data[pivot] = data[i + 1];
         data[i + 1] = temp;
 
@@ -899,6 +955,23 @@ class ResolutionLogsStack
     TicketResolutionNode *top;
 
 public:
+    ResolutionLogsStack() : top(NULL) {}
+
+    void seeRecentlyResolvedTickets()
+    {
+        cout << "===============================" << endl;
+        cout << "      RESOLVED TICKETS" << endl;
+        cout << "===============================" << endl;
+
+        TicketResolutionNode *current = top;
+
+        while (current != NULL)
+        {
+            current->ticket->print();
+            current = current->next;
+        }
+    }
+
     void addTicket(Ticket *ticket)
     {
         if (ticket->isOpen)
@@ -919,9 +992,14 @@ public:
         top = newNode;
     }
 
-    TicketResolutionNode *peek()
+    Ticket *peek()
     {
-        return top;
+        if (top == NULL)
+        {
+            return NULL;
+        }
+
+        return top->ticket;
     }
 };
 
@@ -985,26 +1063,140 @@ public:
 
     void displayQueue()
     {
-        TicketNode *current = front;
+        cout << "================================" << endl;
+        cout << "     PENDING TICKETS QUEUE" << endl;
+        cout << "================================" << endl;
+        TicketNode *current = back;
 
         while (current != NULL)
         {
             current->ticket->print();
-            current = current->prev;
+            current = current->next;
         }
+    }
+
+    Ticket *peekFront()
+    {
+        if (front)
+        {
+            return front->ticket;
+        }
+        else
+        {
+            return NULL;
+        }
+    }
+
+    Ticket *peekBack()
+    {
+        if (back)
+        {
+            return back->ticket;
+        }
+        else
+        {
+            return NULL;
+        }
+    }
+};
+
+class OneStopTicketManagement
+{
+private:
+public:
+    TicketLL allTickets;
+    AgentArray agents;
+    ResolutionLogsStack resolvedTickets;
+    PendingTicketsQueue pendingTickets;
+
+    // Function that assigns all unassigned tickets to agents
+    void assignTicket()
+    {
+        // get a pending ticket
+        Ticket *pendingTicket = pendingTickets.peekBack();
+
+        if (pendingTicket == NULL)
+        {
+            cout << "[+] No pending tickets." << endl;
+
+            return;
+        }
+
+        bool successfullyAssigned = agents.assignTicket(pendingTicket);
+
+        if (successfullyAssigned)
+        {
+            pendingTickets.dequeueTicket();
+            return;
+        }
+
+        cout << "[-] No free agents, can't assign ticket." << endl;
+    }
+
+    void resolveTicket()
+    {
+        Ticket *resolvedTicket = agents.resolveTicket();
+
+        if (resolvedTicket == NULL)
+        {
+            cout << "[+] No tickets to resolve." << endl;
+            return;
+        }
+
+        resolvedTicket->close();
+        resolvedTickets.addTicket(resolvedTicket);
+    }
+
+    // Function that adds a new ticket to the system
+    int addNewTicket(string customerName, int priority, string requestDescription)
+    {
+        Ticket *newTicket = new Ticket(customerName, priority, requestDescription);
+
+        allTickets.addTicket(newTicket);
+        pendingTickets.enqueueTicket(newTicket);
+
+        return newTicket->id;
+    }
+
+    void addNewAgent(string name, string type)
+    {
+        Agent *newAgent = new Agent(name, type);
+        agents.addAgent(newAgent);
     }
 };
 
 int main()
 {
-    Ticket *ticket1 = new Ticket(2, "S1arim Ahmed", 1, "A request");
-    Ticket *ticket2 = new Ticket(1, "S2arim Ahmed", 1, "A request");
-    Ticket *ticket3 = new Ticket(2, "S1arim Ahmed", 2, "A request");
-    Ticket *ticket4 = new Ticket(1, "S2arim Ahmed", 4, "A request");
-    Ticket *ticket5 = new Ticket(4, "S3arim Ahmed", 5, "A request");
-    Ticket *ticket6 = new Ticket(2, "S1arim Ahmed", 1, "A request");
-    Ticket *ticket7 = new Ticket(4, "S3arim Ahmed", 1, "A request");
-    Ticket *ticket8 = new Ticket(1, "S2arim Ahmed", 1, "A request");
-    Ticket *ticket9 = new Ticket(8, "S4arim Ahmed", 1, "A request");
-    Ticket *ticket10 = new Ticket(1, "S2arim Ahmed", 1, "A request");
+    OneStopTicketManagement tm;
+
+    tm.addNewTicket("Moosa", 1, "IT");
+    tm.addNewTicket("Sarim", 1, "A request");
+    tm.addNewTicket("Shaheer", 1, "A request");
+    tm.addNewTicket("Saqib", 1, "A request");
+    tm.addNewTicket("Rafay", 1, "A request");
+    tm.addNewTicket("Abdullah", 1, "A request");
+    tm.addNewAgent("Haris", "IT");
+    tm.addNewAgent("Sohaib", "IT");
+
+    // tm.pendingTickets.displayQueue();
+    // tm.resolvedTickets.seeRecentlyResolvedTickets();
+
+    tm.assignTicket();
+    tm.assignTicket();
+    tm.assignTicket();
+    tm.assignTicket();
+    tm.assignTicket();
+    tm.assignTicket();
+    tm.assignTicket();
+
+    tm.resolveTicket();
+    tm.resolveTicket();
+    tm.resolveTicket();
+    tm.resolveTicket();
+    tm.resolveTicket();
+    tm.resolveTicket();
+    tm.resolveTicket();
+
+    // tm.pendingTickets.displayQueue();
+    // tm.resolvedTickets.seeRecentlyResolvedTickets();
 }
