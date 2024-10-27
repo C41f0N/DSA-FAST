@@ -1107,30 +1107,102 @@ public:
     TicketLL allTickets;
     AgentArray agents;
     ResolutionLogsStack resolvedTickets;
-    PendingTicketsQueue pendingTickets;
+    PendingTicketsQueue pendingTicketsIT;
+    PendingTicketsQueue pendingTicketsAdmin;
+    PendingTicketsQueue pendingTicketsAccounts;
+    PendingTicketsQueue pendingTicketsAcademics;
 
-    // Function that assigns the most urgent ticket to an agent
+    // Function that assigns the most urgent ticket from each type to available agents
     void assignTicket()
     {
-        // get a pending ticket
-        Ticket *pendingTicket = pendingTickets.peekBack();
+        // Assigning from IT
+        Ticket *pendingTicket = pendingTicketsIT.peekBack();
 
         if (pendingTicket == NULL)
         {
-            cout << "[+] No pending tickets." << endl;
-
-            return;
+            cout << "[+] No pending IT tickets." << endl;
         }
-
-        bool successfullyAssigned = agents.assignTicket(pendingTicket);
-
-        if (successfullyAssigned)
+        else
         {
-            pendingTickets.dequeueTicket();
-            return;
+
+            bool successfullyAssigned = agents.assignTicket(pendingTicket);
+
+            if (successfullyAssigned)
+            {
+                pendingTicketsIT.dequeueTicket();
+            }
+            else
+            {
+
+                cout << "[-] No free IT agents, can't assign ticket." << endl;
+            }
         }
 
-        cout << "[-] No free agents, can't assign ticket." << endl;
+        // Assigning from Admin
+        Ticket *pendingTicket = pendingTicketsAdmin.peekBack();
+
+        if (pendingTicket == NULL)
+        {
+            cout << "[+] No pending Admin tickets." << endl;
+        }
+        else
+        {
+
+            bool successfullyAssigned = agents.assignTicket(pendingTicket);
+
+            if (successfullyAssigned)
+            {
+                pendingTicketsAdmin.dequeueTicket();
+            }
+            else
+            {
+                cout << "[-] No free Admin agents, can't assign ticket." << endl;
+            }
+        }
+
+        // Assigning from Accounts
+        Ticket *pendingTicket = pendingTicketsAccounts.peekBack();
+
+        if (pendingTicket == NULL)
+        {
+            cout << "[+] No pending Accounts tickets." << endl;
+        }
+        else
+        {
+
+            bool successfullyAssigned = agents.assignTicket(pendingTicket);
+
+            if (successfullyAssigned)
+            {
+                pendingTicketsAccounts.dequeueTicket();
+            }
+            else
+            {
+                cout << "[-] No free Accounts agents, can't assign ticket." << endl;
+            }
+        }
+
+        // Assigning from Academics
+        Ticket *pendingTicket = pendingTicketsAcademics.peekBack();
+
+        if (pendingTicket == NULL)
+        {
+            cout << "[+] No pending Academics tickets." << endl;
+        }
+        else
+        {
+
+            bool successfullyAssigned = agents.assignTicket(pendingTicket);
+
+            if (successfullyAssigned)
+            {
+                pendingTicketsAcademics.dequeueTicket();
+            }
+            else
+            {
+                cout << "[-] No free Academics agents, can't assign ticket." << endl;
+            }
+        }
     }
 
     // Function that resolves tickets every time its called
@@ -1154,7 +1226,23 @@ public:
         Ticket *newTicket = new Ticket(customerName, priority, requestDescription);
 
         allTickets.addTicket(newTicket);
-        pendingTickets.enqueueTicket(newTicket);
+
+        if (requestDescription == "IT")
+        {
+            pendingTicketsIT.enqueueTicket(newTicket);
+        }
+        else if (requestDescription == "Admin")
+        {
+            pendingTicketsAdmin.enqueueTicket(newTicket);
+        }
+        else if (requestDescription == "Accounts")
+        {
+            pendingTicketsAccounts.enqueueTicket(newTicket);
+        }
+        else if (requestDescription == "Academics")
+        {
+            pendingTicketsAcademics.enqueueTicket(newTicket);
+        }
 
         return newTicket->id;
     }
