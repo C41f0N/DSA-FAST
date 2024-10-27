@@ -98,8 +98,8 @@ public:
 
     TicketLL() : head(NULL), tail(NULL), length(0) {}
 
-    // Traverse
-    void traverse()
+    // Print all tickets
+    void print()
     {
         TicketNode *temp = head;
 
@@ -110,6 +110,7 @@ public:
         }
     }
 
+    // Print all open tickets
     void displayOpenTickets()
     {
         TicketNode *temp = head;
@@ -124,6 +125,7 @@ public:
         }
     }
 
+    // Print all closed tickets
     void displayClosedTickets()
     {
         TicketNode *temp = head;
@@ -138,7 +140,7 @@ public:
         }
     }
 
-    // Add at start
+    // Add a ticket to the list
     void addTicket(Ticket *ticket)
     {
         TicketNode *newNode = new TicketNode(ticket);
@@ -158,6 +160,7 @@ public:
         return;
     }
 
+    // Remove a ticket by id
     void removeTicket(int id)
     {
         TicketNode *temp = head;
@@ -209,13 +212,7 @@ public:
         }
     }
 
-    void swapTicket(Ticket &ticket1, Ticket &ticket2)
-    {
-        Ticket temp(ticket1);
-        ticket1 = ticket2;
-        ticket2 = temp;
-    }
-
+    // Returns a reference to a ticket, given it's id
     Ticket *getTicketById(int id)
     {
         TicketNode *current = head;
@@ -233,6 +230,7 @@ public:
         return NULL;
     }
 
+    // Returns a reference to a ticket, given it's customer's name
     Ticket *getTicketByCustomerName(string customerName)
     {
         TicketNode *current = head;
@@ -250,6 +248,58 @@ public:
         return NULL;
     }
 
+    // Returns a dynamic array containing elements of the linked list
+    Ticket **toArray()
+    {
+
+        // Initializing array
+        if (length > 0)
+        {
+            Ticket **ticketsArray = new Ticket *[length];
+
+            TicketNode *current = head;
+            int i = 0;
+
+            while (current != NULL)
+            {
+                ticketsArray[i] = current->ticket;
+                current = current->next;
+
+                i++;
+            }
+            return ticketsArray;
+        }
+
+        return NULL;
+    }
+
+    // Remove all nodes from the linked list
+    void deleteAll()
+    {
+        TicketNode *current = tail;
+
+        while (current != NULL)
+        {
+            TicketNode *temp = current;
+            current = current->prev;
+            delete temp;
+        }
+
+        head = tail = NULL;
+    }
+
+    // Repopulate the linked list, given an array
+    void fromArray(Ticket **array, int length)
+    {
+        deleteAll();
+
+        for (int i = length - 1; i >= 0; i--)
+        {
+            addTicket(array[i]);
+        }
+    }
+
+    // Sorting algorithms
     void bubbleSort(string sortBy)
     {
         if (head == tail || head == NULL)
@@ -393,54 +443,6 @@ public:
             }
 
             i = i->next;
-        }
-    }
-
-    Ticket **toArray()
-    {
-
-        // Initializing array
-        if (length > 0)
-        {
-            Ticket **ticketsArray = new Ticket *[length];
-
-            TicketNode *current = head;
-            int i = 0;
-
-            while (current != NULL)
-            {
-                ticketsArray[i] = current->ticket;
-                current = current->next;
-
-                i++;
-            }
-            return ticketsArray;
-        }
-
-        return NULL;
-    }
-
-    void deleteAll()
-    {
-        TicketNode *current = tail;
-
-        while (current != NULL)
-        {
-            TicketNode *temp = current;
-            current = current->prev;
-            delete temp;
-        }
-
-        head = tail = NULL;
-    }
-
-    void fromArray(Ticket **array, int length)
-    {
-        deleteAll();
-
-        for (int i = length - 1; i >= 0; i--)
-        {
-            addTicket(array[i]);
         }
     }
 
@@ -623,6 +625,7 @@ public:
         id = rand() % 1000000;
     }
 
+    // Print the agent
     void print()
     {
         cout << "========================" << endl;
@@ -640,6 +643,7 @@ public:
         }
     }
 
+    // Assign a given ticket to a specific agent
     void assignTickets(Ticket *ticket)
     {
         if (available)
@@ -654,7 +658,7 @@ public:
         }
     }
 
-    // Resolves the first assigned ticket
+    // Resolves a ticket assigned to any agent
     Ticket *resolveTicket()
     {
         if (numTicketsAssigned > 0)
@@ -693,6 +697,7 @@ public:
         data = new Agent *[capacity];
     }
 
+    // Print all agents
     void print()
     {
         for (int i = 0; i < length; i++)
@@ -702,6 +707,7 @@ public:
         }
     }
 
+    // Add a new agent
     void addAgent(Agent *agent)
     {
 
@@ -756,6 +762,7 @@ public:
         return false;
     }
 
+    // resolve a single ticket
     Ticket *resolveTicket()
     {
         for (int i = 0; i < length; i++)
@@ -769,6 +776,7 @@ public:
         return NULL;
     }
 
+    // Sorting algorithms
     void bubbleSort()
     {
         for (int i = 0; i < length; i++)
@@ -964,6 +972,7 @@ class ResolutionLogsStack
 public:
     ResolutionLogsStack() : top(NULL) {}
 
+    // Print the complete logs
     void print()
     {
         cout << "===============================" << endl;
@@ -979,6 +988,7 @@ public:
         }
     }
 
+    // Add a new Log
     void addTicket(Ticket *ticket)
     {
         if (ticket->isOpen)
@@ -999,6 +1009,7 @@ public:
         top = newNode;
     }
 
+    // Get the most recent log
     Ticket *peek()
     {
         if (top == NULL)
@@ -1018,11 +1029,13 @@ class PendingTicketsQueue
 public:
     PendingTicketsQueue() : front(NULL), back(NULL), length(0) {}
 
+    // whether the queue is empty or not
     bool isEmpty()
     {
         return front == NULL && back == NULL;
     }
 
+    // enqueue a ticket based on priority
     void enqueueTicket(Ticket *ticket)
     {
         if (!ticket->isOpen)
@@ -1078,6 +1091,7 @@ public:
         return;
     }
 
+    // dequeue a ticket
     Ticket *dequeueTicket()
     {
         if (isEmpty())
@@ -1101,6 +1115,7 @@ public:
         return removedTicket;
     }
 
+    // print the whole queue
     void displayQueue()
     {
         cout << "================================" << endl;
@@ -1115,6 +1130,7 @@ public:
         }
     }
 
+    // returns the ticket at front if exits
     Ticket *peekFront()
     {
         if (front)
@@ -1127,6 +1143,7 @@ public:
         }
     }
 
+    // returns the ticket at back if exits
     Ticket *peekBack()
     {
         if (back)
@@ -1153,24 +1170,28 @@ public:
         loadFromFile();
     }
 
+    // Sets threshold and updates it in files
     void setThreshold(int value)
     {
         threshold = value;
         writeToFile();
     }
 
+    // Sets sorting algorithm for larger datasets
     void setSortHigh(string value)
     {
         sortHigh = value;
         writeToFile();
     }
 
+    // Sets sorting algorithm for smaller datasets
     void setSortLow(string value)
     {
         sortLow = value;
         writeToFile();
     }
 
+    // Display the set configuration
     void display()
     {
         cout << "=========================================" << endl;
@@ -1182,6 +1203,7 @@ public:
         cout << "Threshold: " << threshold << endl;
     }
 
+    // Set default configuration
     void setDefaultData()
     {
         sortHigh = "quick";
@@ -1189,6 +1211,7 @@ public:
         threshold = 10;
     }
 
+    // Write config data to file
     void writeToFile()
     {
         ofstream configFile("oneStop.conf");
@@ -1198,6 +1221,7 @@ public:
         configFile << threshold << endl;
     }
 
+    // Load config data from file
     void loadFromFile()
     {
         ifstream configFile("oneStop.conf");
@@ -1232,6 +1256,7 @@ public:
     PendingTicketsQueue pendingTicketsAccounts;
     PendingTicketsQueue pendingTicketsAcademics;
 
+    // Function to start the management system's user interaction
     void run()
     {
         bool running = true;
@@ -1357,7 +1382,7 @@ public:
                         break;
 
                     case 3:
-                        allTickets.traverse();
+                        allTickets.print();
                         break;
 
                     default:
@@ -1770,6 +1795,7 @@ public:
         agents.addAgent(newAgent);
     }
 
+    // Search a ticket by id
     void searchTicketByID(int id)
     {
         Ticket *ticket = allTickets.getTicketById(id);
@@ -1782,6 +1808,7 @@ public:
         }
     }
 
+    // Search a ticket by customer name
     void searchTicketByName(string customerName)
     {
         Ticket *ticket = allTickets.getTicketByCustomerName(customerName);
@@ -1794,15 +1821,17 @@ public:
         }
     }
 
+    // Display all tickets that ever entered the system
     void displayAllTickets()
     {
         cout << "======================================" << endl;
         cout << "      Displaying All Tickets" << endl;
         cout << "======================================" << endl;
 
-        allTickets.traverse();
+        allTickets.print();
     }
 
+    // Display all open tickets that ever entered the system
     void displayAllOpenTickets()
     {
         cout << "======================================" << endl;
@@ -1812,6 +1841,7 @@ public:
         allTickets.displayOpenTickets();
     }
 
+    // Display all closed tickets that ever entered the system
     void displayAllClosedTickets()
     {
         cout << "======================================" << endl;
@@ -1821,6 +1851,7 @@ public:
         allTickets.displayClosedTickets();
     }
 
+    // Sort agents based on the configuration set
     void sortAgents()
     {
         string sortAlgorithm;
@@ -1865,6 +1896,7 @@ public:
         cout << "Time Taken (ms): " << difftime(system_clock::to_time_t(sortEnd), system_clock::to_time_t(sortStart)) << endl;
     }
 
+    // Sort tickets based on the configuration set
     void sortTickets(string sortBy)
     {
         string sortAlgorithm;
@@ -1924,6 +1956,7 @@ int main()
     tm.addNewAgent("Abdullah", "Academics");
     tm.addNewAgent("Usaid", "Academics");
 
+    // Initiating the user interaction.
     tm.run();
 
     exit(0);
