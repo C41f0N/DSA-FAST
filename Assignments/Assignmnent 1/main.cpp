@@ -593,11 +593,11 @@ public:
         cout << "Agent Name: " << name << endl;
         cout << "Total Tickets Assigned: " << numTicketsAssigned << endl
              << endl;
-        for (int i = 0; i < numTicketsAssigned; i++)
-        {
-            cout << "Ticket#" << i << endl;
-            assignedTickets[i]->print();
-        }
+        // for (int i = 0; i < numTicketsAssigned; i++)
+        // {
+        //     cout << "Ticket#" << i << endl;
+        //     assignedTickets[i]->print();
+        // }
     }
 
     void assignTicket(Ticket *ticket)
@@ -629,6 +629,15 @@ public:
         data = new Agent[capacity];
     }
 
+    void print()
+    {
+        for (int i = 0; i < length; i++)
+        {
+            data[i].print();
+            cout << endl;
+        }
+    }
+
     void addAgent(Agent agent)
     {
 
@@ -653,6 +662,22 @@ public:
 
         data[length - 1] = agent;
     }
+
+    void bubbleSort()
+    {
+        for (int i = 0; i < length; i++)
+        {
+            for (int j = 0; j < length - 1; j++)
+            {
+                if (data[j].numTicketsAssigned > data[j + 1].numTicketsAssigned)
+                {
+                    Agent temp(data[j]);
+                    data[j] = data[j + 1];
+                    data[j + 1] = temp;
+                }
+            }
+        }
+    }
 };
 
 int main()
@@ -671,16 +696,36 @@ int main()
     Agent agent(21, "Sarim");
     Agent agent1(21, "Sarim");
     Agent agent2(21, "Sarim");
+    Agent agent3(21, "Sarim");
 
     AgentArray agents;
 
-    agents.addAgent(agent);
-    agents.addAgent(agent1);
-    agents.addAgent(agent2);
-    agents.addAgent(agent2);
-    agents.addAgent(agent2);
+    agent1.assignTicket(&ticket10);
+    agent1.assignTicket(&ticket10);
 
-    cout << agents.length << endl;
+    agent2.assignTicket(&ticket1);
+    agent2.assignTicket(&ticket1);
+    agent2.assignTicket(&ticket1);
+    agent2.assignTicket(&ticket1);
+
+    agent.assignTicket(&ticket2);
+    agent.assignTicket(&ticket2);
+    agent.assignTicket(&ticket2);
+
+    agent3.assignTicket(&ticket3);
+    agent3.assignTicket(&ticket3);
+    agent3.assignTicket(&ticket3);
+    agent3.assignTicket(&ticket3);
+    agent3.assignTicket(&ticket3);
+
+    agents.addAgent(agent3);
+    agents.addAgent(agent);
+    agents.addAgent(agent2);
+    agents.addAgent(agent1);
+
+    agents.bubbleSort();
+
+    agents.print();
 
     // agent.print();
 }
