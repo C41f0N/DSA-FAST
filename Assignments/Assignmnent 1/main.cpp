@@ -630,6 +630,7 @@ public:
         cout << "========================" << endl;
         cout << "ID: " << id << endl;
         cout << "Name: " << name << endl;
+        cout << "Type: " << type << endl;
         cout << "Total Tickets Assigned: " << numTicketsAssigned
              << endl;
         for (int i = 0; i < numTicketsAssigned; i++)
@@ -1274,6 +1275,11 @@ public:
                 cout << "[5] Print Config" << endl;
                 cout << "[6] Change Config" << endl;
                 cout << "[7] Search Ticket with Report" << endl;
+                cout << "[8] Print Queue" << endl;
+                cout << "[9] Print Resolved Tickets" << endl;
+                cout << "[10] Show Agents" << endl;
+                cout << "[11] Sort Agents with Report" << endl;
+                cout << "[12] Sort Tickets with Report" << endl;
                 cout << endl;
                 cout << "Your option: ";
 
@@ -1317,9 +1323,9 @@ public:
 
                 case 3:
                     // Resolve Ticket
+                    cout << "[+] Attempting to resolve a ticket assigned to agents." << endl;
                     resolveTicket();
 
-                    cout << "[+] Resolved a ticket which was assigned to an agent." << endl;
                     cout << "Press any key to continue...";
                     getchar();
                     getchar();
@@ -1446,6 +1452,81 @@ public:
 
                     break;
 
+                case 8:
+                    cout << "[0] IT" << endl;
+                    cout << "[1] Admin" << endl;
+                    cout << "[2] Accounts" << endl;
+                    cout << "[3] Academics" << endl;
+                    cout << endl;
+                    cout << "Choose a type:" << endl;
+
+                    cin >> option;
+
+                    switch (option)
+                    {
+                    case 0:
+                        pendingTicketsIT.displayQueue();
+                        break;
+
+                    case 1:
+                        pendingTicketsAdmin.displayQueue();
+                        break;
+
+                    case 2:
+                        pendingTicketsAccounts.displayQueue();
+                        break;
+
+                    case 3:
+                        pendingTicketsAcademics.displayQueue();
+                        break;
+
+                    default:
+                        break;
+                    }
+
+                    break;
+
+                case 9:
+                    resolvedTickets.print();
+                    break;
+
+                case 10:
+                    agents.print();
+                    break;
+
+                case 11:
+                    sortAgents();
+                    cout << "[+] Agents Sorted." << endl;
+                    break;
+
+                case 12:
+                    cout << "What do you want to sort them by?" << endl;
+                    cout << "[0] Priority" << endl;
+                    cout << "[1] Creation Time" << endl;
+                    cout << "[2] Customer Name" << endl;
+                    cout << endl;
+                    cout << "Your option: ";
+                    cin >> option;
+
+                    switch (option)
+                    {
+                    case 0:
+                        sortTickets("priority");
+                        break;
+                    case 1:
+                        sortTickets("creationTime");
+                        break;
+                    case 2:
+                        sortTickets("customerName");
+                        break;
+
+                    default:
+                        break;
+                    }
+                    cout << "[+] Tickets Sorted." << endl;
+
+                    break;
+
                 default:
                     break;
                 }
@@ -1456,6 +1537,7 @@ public:
                 cout << "[0] Quit" << endl;
                 cout << "[1] Add Ticket" << endl;
                 cout << "[2] Search Ticket" << endl;
+                cout << "[3] See Pending Tickets" << endl;
                 cout << endl;
                 cout << "Your option: ";
 
@@ -1480,6 +1562,11 @@ public:
                     inputInt = addNewTicket(customerNameInput, inputInt, ticketDetailsInput);
                     cout << "[+] Ticket Successfully added." << endl;
                     cout << "[+] Your Ticket ID: " << inputInt << endl;
+                    char c;
+                    cout << "Press any key to continue...";
+                    getchar();
+                    getchar();
+                    cout << endl;
 
                     break;
                 case 2:
@@ -1504,6 +1591,40 @@ public:
                         cin >> inputStr;
 
                         searchTicketByName(inputStr);
+                    }
+
+                    break;
+
+                case 3:
+                    cout << "[0] IT" << endl;
+                    cout << "[1] Admin" << endl;
+                    cout << "[2] Accounts" << endl;
+                    cout << "[3] Academics" << endl;
+                    cout << endl;
+                    cout << "Choose a type:";
+
+                    cin >> option;
+
+                    switch (option)
+                    {
+                    case 0:
+                        pendingTicketsIT.displayQueue();
+                        break;
+
+                    case 1:
+                        pendingTicketsAdmin.displayQueue();
+                        break;
+
+                    case 2:
+                        pendingTicketsAccounts.displayQueue();
+                        break;
+
+                    case 3:
+                        pendingTicketsAcademics.displayQueue();
+                        break;
+
+                    default:
+                        break;
                     }
 
                     break;
@@ -1700,6 +1821,50 @@ public:
         allTickets.displayClosedTickets();
     }
 
+    void sortAgents()
+    {
+        string sortAlgorithm;
+
+        if (agents.length <= configuration.threshold)
+        {
+            sortAlgorithm = configuration.sortLow;
+        }
+        else
+        {
+            sortAlgorithm = configuration.sortHigh;
+        }
+
+        chrono::_V2::system_clock::time_point sortStart = chrono::_V2::system_clock::now();
+
+        if (sortAlgorithm == "bubble")
+        {
+            agents.bubbleSort();
+        }
+        else if (sortAlgorithm == "insertion")
+        {
+            agents.insertionSort();
+        }
+        else if (sortAlgorithm == "selection")
+        {
+            agents.selectionSort();
+        }
+        else if (sortAlgorithm == "quick")
+        {
+            agents.quickSort();
+        }
+        else if (sortAlgorithm == "merge")
+        {
+            agents.mergeSort();
+        }
+
+        chrono::_V2::system_clock::time_point sortEnd = chrono::_V2::system_clock::now();
+
+        cout << "--> Agents Sorting Report" << endl;
+        cout << "Algorithm: " << sortAlgorithm << endl;
+        cout << "n: " << agents.length << endl;
+        cout << "Time Taken (ms): " << difftime(system_clock::to_time_t(sortEnd), system_clock::to_time_t(sortStart)) << endl;
+    }
+
     void sortTickets(string sortBy)
     {
         string sortAlgorithm;
@@ -1712,6 +1877,8 @@ public:
         {
             sortAlgorithm = configuration.sortHigh;
         }
+
+        chrono::_V2::system_clock::time_point sortStart = chrono::_V2::system_clock::now();
 
         if (sortAlgorithm == "bubble")
         {
@@ -1733,6 +1900,13 @@ public:
         {
             allTickets.mergeSort(sortBy);
         }
+
+        chrono::_V2::system_clock::time_point sortEnd = chrono::_V2::system_clock::now();
+
+        cout << "--> Ticket Sorting Report" << endl;
+        cout << "Algorithm: " << sortAlgorithm << endl;
+        cout << "n: " << allTickets.length << endl;
+        cout << "Time Taken (ms): " << system_clock::to_time_t(sortEnd) - system_clock::to_time_t(sortStart) << endl;
     }
 };
 
@@ -1741,6 +1915,14 @@ int main()
     srand(time(NULL));
 
     OneStopTicketManagement tm;
+
+    // Adding agents as per assignment requirement
+    tm.addNewAgent("Sarim", "IT");
+    tm.addNewAgent("Moosa", "Admin");
+    tm.addNewAgent("Shaheer", "Accounts");
+    tm.addNewAgent("Rafay", "Academics");
+    tm.addNewAgent("Abdullah", "Academics");
+    tm.addNewAgent("Usaid", "Academics");
 
     tm.run();
 
