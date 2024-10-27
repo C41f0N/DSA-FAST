@@ -16,6 +16,8 @@ public:
     bool isOpen;
     chrono::_V2::system_clock::time_point closeTime{};
 
+    Ticket() {}
+
     Ticket(
         int id,
         string customerName,
@@ -155,6 +157,13 @@ public:
 
             temp = temp->next;
         }
+    }
+
+    void swapTicket(Ticket &ticket1, Ticket &ticket2)
+    {
+        Ticket temp(ticket1);
+        ticket1 = ticket2;
+        ticket2 = temp;
     }
 
     Ticket *getTicketById(int id)
@@ -336,25 +345,142 @@ public:
             i = i->next;
         }
     }
+
+    int getLength()
+    {
+        int length = 0;
+        TicketNode *current = head;
+
+        while (current != NULL)
+        {
+            length++;
+            current = current->next;
+        }
+
+        return length;
+    }
+
+    Ticket *toArray()
+    {
+        // Getting length
+        int length = getLength();
+
+        // Initializing array
+        if (length > 0)
+        {
+            Ticket *ticketsArray = new Ticket[length];
+
+            TicketNode *current = head;
+            int i = 0;
+
+            while (current != NULL)
+            {
+                ticketsArray[i] = current->ticket;
+                current = current->next;
+
+                i++;
+            }
+            return ticketsArray;
+        }
+
+        return NULL;
+    }
+
+    void deleteAll()
+    {
+        TicketNode *current = tail;
+
+        while (current != NULL)
+        {
+            TicketNode *temp = current;
+            current = current->prev;
+            delete temp;
+        }
+
+        head = tail = NULL;
+    }
+
+    void fromArray(Ticket *array, int length)
+    {
+        deleteAll();
+
+        for (int i = 0; i < length; i++)
+        {
+            addTicket(array[i]);
+        }
+    }
+
+    int partition(Ticket *array, int left, int right)
+    {
+
+        Ticket pivot = array[right];
+        int i = left - 1;
+
+        for (int j = left; j < right; j++)
+        {
+            if (array[j].id < pivot.id)
+            {
+                i++;
+                swap(array[i], array[j]);
+            }
+        }
+
+        swap(array[i + 1], array[right]);
+
+        return i + 1;
+    }
+
+    void qs(Ticket *array, int left, int right)
+    {
+        if (left < right)
+        {
+            int pi = partition(array, left, right);
+            qs(array, left, pi - 1);
+            qs(array, pi + 1, right);
+        }
+    }
+
+    void quickSort()
+    {
+        // Convert LL to Array
+        Ticket *tickets = toArray();
+        int length = getLength();
+
+        qs(tickets, 0, length - 1);
+
+        fromArray(tickets, length);
+    }
 };
 
 int main()
 {
     Ticket ticket1(2, "S1arim Ahmed", 1, "A request");
-    Ticket ticket3(1, "S2arim Ahmed", 1, "A request");
-    Ticket ticket2(4, "S3arim Ahmed", 1, "A request");
-    Ticket ticket4(8, "S4arim Ahmed", 1, "A request");
+    Ticket ticket2(1, "S2arim Ahmed", 1, "A request");
+    Ticket ticket3(2, "S1arim Ahmed", 1, "A request");
+    Ticket ticket4(1, "S2arim Ahmed", 1, "A request");
+    Ticket ticket5(4, "S3arim Ahmed", 1, "A request");
+    Ticket ticket6(2, "S1arim Ahmed", 1, "A request");
+    Ticket ticket7(4, "S3arim Ahmed", 1, "A request");
+    Ticket ticket8(1, "S2arim Ahmed", 1, "A request");
+    Ticket ticket9(8, "S4arim Ahmed", 1, "A request");
+    Ticket ticket10(1, "S2arim Ahmed", 1, "A request");
 
     TicketLL ll;
 
     ticket4.close();
 
+    ll.addTicket(ticket1);
     ll.addTicket(ticket2);
     ll.addTicket(ticket3);
-    ll.addTicket(ticket1);
     ll.addTicket(ticket4);
+    ll.addTicket(ticket5);
+    ll.addTicket(ticket6);
+    ll.addTicket(ticket7);
+    ll.addTicket(ticket8);
+    ll.addTicket(ticket9);
+    ll.addTicket(ticket10);
 
-    ll.selectionSort("customerName");
+    ll.quickSort();
 
     // ll.removeTicket(1);
     // ll.removeTicket(2);
