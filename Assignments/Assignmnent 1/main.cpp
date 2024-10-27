@@ -678,6 +678,29 @@ public:
             }
         }
     }
+
+    void selectionSort()
+    {
+        for (int i = 0; i < length - 1; i++)
+        {
+            int smallest = i;
+
+            for (int j = i + 1; j < length; j++)
+            {
+                if (data[j].numTicketsAssigned < data[smallest].numTicketsAssigned)
+                {
+                    smallest = j;
+                }
+            }
+
+            if (i != smallest)
+            {
+                Agent temp(data[smallest]);
+                data[smallest] = data[i];
+                data[i] = temp;
+            }
+        }
+    }
 };
 
 int main()
@@ -723,7 +746,7 @@ int main()
     agents.addAgent(agent2);
     agents.addAgent(agent1);
 
-    agents.bubbleSort();
+    agents.selectionSort();
 
     agents.print();
 
