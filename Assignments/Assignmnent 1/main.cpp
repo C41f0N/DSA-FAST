@@ -91,8 +91,9 @@ class TicketLL
 public:
     TicketNode *head;
     TicketNode *tail;
+    int length;
 
-    TicketLL() : head(NULL), tail(NULL) {}
+    TicketLL() : head(NULL), tail(NULL), length(0) {}
 
     // Traverse
     void traverse()
@@ -138,6 +139,7 @@ public:
     void addTicket(Ticket *ticket)
     {
         TicketNode *newNode = new TicketNode(ticket);
+        length++;
 
         if (head == NULL)
         {
@@ -391,24 +393,8 @@ public:
         }
     }
 
-    int getLength()
-    {
-        int length = 0;
-        TicketNode *current = head;
-
-        while (current != NULL)
-        {
-            length++;
-            current = current->next;
-        }
-
-        return length;
-    }
-
     Ticket **toArray()
     {
-        // Getting length
-        int length = getLength();
 
         // Initializing array
         if (length > 0)
@@ -505,7 +491,6 @@ public:
     {
         // Convert LL to Array
         Ticket **tickets = toArray();
-        int length = getLength();
 
         qs(tickets, 0, length - 1, sortBy);
 
@@ -604,7 +589,6 @@ public:
     {
 
         Ticket **tickets = toArray();
-        int length = getLength();
 
         ms(tickets, 0, length - 1, sortBy);
 
@@ -1403,25 +1387,34 @@ public:
 
     void sortTickets(string sortBy)
     {
-        string defaultSortAlg = "bubble";
+        string sortAlgorithm;
 
-        if (defaultSortAlg == "bubble")
+        if (allTickets.length <= configuration.threshold)
+        {
+            sortAlgorithm = configuration.sortLow;
+        }
+        else
+        {
+            sortAlgorithm = configuration.sortHigh;
+        }
+
+        if (sortAlgorithm == "bubble")
         {
             allTickets.bubbleSort(sortBy);
         }
-        else if (defaultSortAlg == "insertion")
+        else if (sortAlgorithm == "insertion")
         {
             allTickets.insertionSort(sortBy);
         }
-        else if (defaultSortAlg == "selection")
+        else if (sortAlgorithm == "selection")
         {
             allTickets.selectionSort(sortBy);
         }
-        else if (defaultSortAlg == "quick")
+        else if (sortAlgorithm == "quick")
         {
             allTickets.quickSort(sortBy);
         }
-        else if (defaultSortAlg == "merge")
+        else if (sortAlgorithm == "merge")
         {
             allTickets.mergeSort(sortBy);
         }
