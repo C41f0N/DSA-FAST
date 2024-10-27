@@ -1131,6 +1131,24 @@ public:
         loadFromFile();
     }
 
+    void setThreshold(int value)
+    {
+        threshold = value;
+        writeToFile();
+    }
+
+    void setSortHigh(string value)
+    {
+        sortHigh = value;
+        writeToFile();
+    }
+
+    void setSortLow(string value)
+    {
+        sortLow = value;
+        writeToFile();
+    }
+
     void display()
     {
         cout << "=========================================" << endl;
