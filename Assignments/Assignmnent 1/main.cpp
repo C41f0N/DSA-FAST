@@ -38,17 +38,32 @@ public:
     void print()
     {
         cout << "Ticket ID: " << id << endl;
+        cout << "Priority: " << priority << endl;
         cout << "Customer Name: " << customerName << endl;
         cout << "Request Decription: " << requestDescription << endl;
         cout << "Creation Time: ";
         printCreationTime();
+
+        if (!isOpen)
+        {
+            cout << "Closing Time: ";
+            printClosingTime();
+        }
+
         cout << "Is Open: " << isOpen << endl;
+
         cout << endl;
     }
 
     void printCreationTime()
     {
         time_t retTime = system_clock::to_time_t(creationTime);
+        cout << ctime(&retTime);
+    }
+
+    void printClosingTime()
+    {
+        time_t retTime = system_clock::to_time_t(closeTime);
         cout << ctime(&retTime);
     }
 
@@ -62,11 +77,11 @@ public:
 class TicketNode
 {
 public:
-    Ticket ticket;
+    Ticket *ticket;
     TicketNode *next;
     TicketNode *prev;
 
-    TicketNode(Ticket &ticket) : ticket(ticket), next(NULL), prev(NULL) {}
+    TicketNode(Ticket *ticket) : ticket(ticket), next(NULL), prev(NULL) {}
 };
 
 class TicketLL
@@ -84,13 +99,13 @@ public:
 
         while (temp != NULL)
         {
-            temp->ticket.print();
+            temp->ticket->print();
             temp = temp->next;
         }
     }
 
     // Add at start
-    void addTicket(Ticket &ticket)
+    void addTicket(Ticket *ticket)
     {
         TicketNode *newNode = new TicketNode(ticket);
 
@@ -114,7 +129,7 @@ public:
 
         while (temp != NULL)
         {
-            if (temp->ticket.id == id)
+            if (temp->ticket->id == id)
             {
                 cout << "[+] Deleting ticket " << id << endl;
 
@@ -172,9 +187,9 @@ public:
 
         while (current != NULL)
         {
-            if (current->ticket.id == id)
+            if (current->ticket->id == id)
             {
-                return &current->ticket;
+                return current->ticket;
             }
 
             current = current->next;
@@ -189,9 +204,9 @@ public:
 
         while (current != NULL)
         {
-            if (current->ticket.customerName == customerName)
+            if (current->ticket->customerName == customerName)
             {
-                return &current->ticket;
+                return current->ticket;
             }
 
             current = current->next;
@@ -226,20 +241,20 @@ public:
                 bool condition = false;
                 if (sortBy == "priority")
                 {
-                    condition = current->prev->ticket.priority > current->ticket.priority;
+                    condition = current->prev->ticket->priority > current->ticket->priority;
                 }
                 else if (sortBy == "creationTime")
                 {
-                    condition = current->prev->ticket.creationTime > current->ticket.creationTime;
+                    condition = current->prev->ticket->creationTime > current->ticket->creationTime;
                 }
                 else if (sortBy == "customerName")
                 {
-                    condition = current->prev->ticket.customerName > current->ticket.customerName;
+                    condition = current->prev->ticket->customerName > current->ticket->customerName;
                 }
 
                 if (condition)
                 {
-                    Ticket temp(current->prev->ticket);
+                    Ticket *temp = current->prev->ticket;
                     current->prev->ticket = current->ticket;
                     current->ticket = temp;
                 }
@@ -257,22 +272,22 @@ public:
         while (current != NULL)
         {
 
-            Ticket key(current->ticket);
+            Ticket *key = current->ticket;
 
             TicketNode *j = current;
             bool condition = false;
 
             if (sortBy == "priority" && j->prev != NULL)
             {
-                condition = j->prev->ticket.priority > key.priority;
+                condition = j->prev->ticket->priority > key->priority;
             }
             else if (sortBy == "creationTime" && j->prev != NULL)
             {
-                condition = j->prev->ticket.creationTime > key.creationTime;
+                condition = j->prev->ticket->creationTime > key->creationTime;
             }
             else if (sortBy == "customerName" && j->prev != NULL)
             {
-                condition = j->prev->ticket.customerName > key.customerName;
+                condition = j->prev->ticket->customerName > key->customerName;
             }
 
             while (j->prev != NULL && condition)
@@ -285,15 +300,15 @@ public:
 
                 if (sortBy == "priority" && j->prev != NULL)
                 {
-                    condition = j->prev->ticket.priority > key.priority;
+                    condition = j->prev->ticket->priority > key->priority;
                 }
                 else if (sortBy == "creationTime" && j->prev != NULL)
                 {
-                    condition = j->prev->ticket.creationTime > key.creationTime;
+                    condition = j->prev->ticket->creationTime > key->creationTime;
                 }
                 else if (sortBy == "customerName" && j->prev != NULL)
                 {
-                    condition = j->prev->ticket.customerName > key.customerName;
+                    condition = j->prev->ticket->customerName > key->customerName;
                 }
             }
 
@@ -319,15 +334,15 @@ public:
 
                 if (sortBy == "priority")
                 {
-                    condition = current->ticket.priority > minimum->ticket.priority;
+                    condition = current->ticket->priority > minimum->ticket->priority;
                 }
                 else if (sortBy == "creationTime")
                 {
-                    condition = current->ticket.creationTime > minimum->ticket.creationTime;
+                    condition = current->ticket->creationTime > minimum->ticket->creationTime;
                 }
                 else if (sortBy == "customerName")
                 {
-                    condition = current->ticket.customerName > minimum->ticket.customerName;
+                    condition = current->ticket->customerName > minimum->ticket->customerName;
                 }
 
                 if (condition)
@@ -335,7 +350,7 @@ public:
                     minimum = current;
                 }
 
-                Ticket temp(minimum->ticket);
+                Ticket *temp = minimum->ticket;
                 minimum->ticket = current->ticket;
                 current->ticket = temp;
 
@@ -360,7 +375,7 @@ public:
         return length;
     }
 
-    Ticket *toArray()
+    Ticket **toArray()
     {
         // Getting length
         int length = getLength();
@@ -368,7 +383,7 @@ public:
         // Initializing array
         if (length > 0)
         {
-            Ticket *ticketsArray = new Ticket[length];
+            Ticket **ticketsArray = new Ticket *[length];
 
             TicketNode *current = head;
             int i = 0;
@@ -400,7 +415,7 @@ public:
         head = tail = NULL;
     }
 
-    void fromArray(Ticket *array, int length)
+    void fromArray(Ticket **array, int length)
     {
         deleteAll();
 
@@ -410,10 +425,10 @@ public:
         }
     }
 
-    int partition(Ticket *array, int left, int right, string sortBy)
+    int partition(Ticket **array, int left, int right, string sortBy)
     {
 
-        Ticket pivot = array[right];
+        Ticket pivot = *array[right];
         int i = left - 1;
 
         for (int j = left; j < right; j++)
@@ -423,15 +438,15 @@ public:
 
             if (sortBy == "priority")
             {
-                condition = array[j].priority < pivot.priority;
+                condition = array[j]->priority < pivot.priority;
             }
             else if (sortBy == "creationTime")
             {
-                condition = array[j].creationTime < pivot.creationTime;
+                condition = array[j]->creationTime < pivot.creationTime;
             }
             else if (sortBy == "customerName")
             {
-                condition = array[j].customerName < pivot.customerName;
+                condition = array[j]->customerName < pivot.customerName;
             }
 
             if (condition)
@@ -446,7 +461,7 @@ public:
         return i + 1;
     }
 
-    void qs(Ticket *array, int left, int right, string sortBy)
+    void qs(Ticket **array, int left, int right, string sortBy)
     {
         if (left < right)
         {
@@ -459,7 +474,7 @@ public:
     void quickSort(string sortBy)
     {
         // Convert LL to Array
-        Ticket *tickets = toArray();
+        Ticket **tickets = toArray();
         int length = getLength();
 
         qs(tickets, 0, length - 1, sortBy);
@@ -468,7 +483,7 @@ public:
         delete[] tickets;
     }
 
-    void merge(Ticket *tickets, int left, int mid, int right, string sortBy)
+    void merge(Ticket **tickets, int left, int mid, int right, string sortBy)
     {
         if (left == right)
         {
@@ -478,8 +493,8 @@ public:
         int n1 = mid - left + 1;
         int n2 = right - mid;
 
-        Ticket *leftArray = new Ticket[n1];
-        Ticket *rightArray = new Ticket[n2];
+        Ticket **leftArray = new Ticket *[n1];
+        Ticket **rightArray = new Ticket *[n2];
 
         for (int i = 0; i < n1; i++)
         {
@@ -499,15 +514,15 @@ public:
 
             if (sortBy == "priority")
             {
-                condition = leftArray[i].priority <= rightArray[j].priority;
+                condition = leftArray[i]->priority <= rightArray[j]->priority;
             }
             else if (sortBy == "creationTime")
             {
-                condition = leftArray[i].creationTime <= rightArray[j].creationTime;
+                condition = leftArray[i]->creationTime <= rightArray[j]->creationTime;
             }
             else if (sortBy == "customerName")
             {
-                condition = leftArray[i].customerName <= rightArray[j].customerName;
+                condition = leftArray[i]->customerName <= rightArray[j]->customerName;
             }
 
             if (condition)
@@ -543,7 +558,7 @@ public:
         delete[] rightArray;
     }
 
-    void ms(Ticket *tickets, int left, int right, string sortBy)
+    void ms(Ticket **tickets, int left, int right, string sortBy)
     {
         if (left < right)
         {
@@ -558,7 +573,7 @@ public:
     void mergeSort(string sortBy)
     {
 
-        Ticket *tickets = toArray();
+        Ticket **tickets = toArray();
         int length = getLength();
 
         ms(tickets, 0, length - 1, sortBy);
