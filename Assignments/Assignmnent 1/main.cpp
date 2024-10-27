@@ -896,52 +896,85 @@ public:
         return top;
     }
 };
+
+class PendingTicketsQueue
+{
+    TicketNode *front, *back;
+    int length;
+
+public:
+    PendingTicketsQueue() : front(NULL), back(NULL), length(0) {}
+
+    bool isEmpty()
+    {
+        return front == NULL && back == NULL;
+    }
+
+    void enqueueTicket(Ticket *ticket)
+    {
+        if (!ticket->isOpen)
+        {
+            cout << "Cannot enqueue, this queue is for open tickets only." << endl;
+            return;
+        }
+
+        TicketNode *newNode = new TicketNode(ticket);
+        length++;
+
+        if (isEmpty())
+        {
+            front = back = newNode;
+            return;
+        }
+
+        front->next = newNode;
+        front = newNode;
+    }
+
+    Ticket *dequeueTicket()
+    {
+        if (isEmpty())
+        {
+            return NULL;
+        }
+
+        Ticket *removedTicket = back->ticket;
+
+        // If last element
+        if (front == back)
+        {
+            front = back = NULL;
+        }
+        else
+        {
+            back = back->next;
+        }
+
+        return removedTicket;
+    }
+};
+
 int main()
 {
-    Ticket ticket1(2, "S1arim Ahmed", 1, "A request");
-    Ticket ticket2(1, "S2arim Ahmed", 1, "A request");
-    Ticket ticket3(2, "S1arim Ahmed", 1, "A request");
-    Ticket ticket4(1, "S2arim Ahmed", 1, "A request");
-    Ticket ticket5(4, "S3arim Ahmed", 1, "A request");
-    Ticket ticket6(2, "S1arim Ahmed", 1, "A request");
-    Ticket ticket7(4, "S3arim Ahmed", 1, "A request");
-    Ticket ticket8(1, "S2arim Ahmed", 1, "A request");
-    Ticket ticket9(8, "S4arim Ahmed", 1, "A request");
-    Ticket ticket10(1, "S2arim Ahmed", 1, "A request");
+    Ticket *ticket1 = new Ticket(2, "S1arim Ahmed", 1, "A request");
+    Ticket *ticket2 = new Ticket(1, "S2arim Ahmed", 1, "A request");
+    Ticket *ticket3 = new Ticket(2, "S1arim Ahmed", 2, "A request");
+    Ticket *ticket4 = new Ticket(1, "S2arim Ahmed", 4, "A request");
+    Ticket *ticket5 = new Ticket(4, "S3arim Ahmed", 5, "A request");
+    Ticket *ticket6 = new Ticket(2, "S1arim Ahmed", 1, "A request");
+    Ticket *ticket7 = new Ticket(4, "S3arim Ahmed", 1, "A request");
+    Ticket *ticket8 = new Ticket(1, "S2arim Ahmed", 1, "A request");
+    Ticket *ticket9 = new Ticket(8, "S4arim Ahmed", 1, "A request");
+    Ticket *ticket10 = new Ticket(1, "S2arim Ahmed", 1, "A request");
 
-    Agent agent(21, "Sarim");
-    Agent agent1(21, "Sarim");
-    Agent agent2(21, "Sarim");
-    Agent agent3(21, "Sarim");
+    TicketLL tickets;
 
-    AgentArray agents;
+    tickets.addTicket(ticket10);
+    tickets.addTicket(ticket1);
+    tickets.addTicket(ticket2);
+    tickets.addTicket(ticket3);
 
-    agent1.assignTicket(&ticket10);
-    agent1.assignTicket(&ticket10);
+    tickets.bubbleSort("priority");
 
-    agent2.assignTicket(&ticket1);
-    agent2.assignTicket(&ticket1);
-    agent2.assignTicket(&ticket1);
-    agent2.assignTicket(&ticket1);
-
-    agent.assignTicket(&ticket2);
-    agent.assignTicket(&ticket2);
-    agent.assignTicket(&ticket2);
-
-    agent3.assignTicket(&ticket3);
-    agent3.assignTicket(&ticket3);
-    agent3.assignTicket(&ticket3);
-    agent3.assignTicket(&ticket3);
-    agent3.assignTicket(&ticket3);
-
-    agents.addAgent(agent3);
-    agents.addAgent(agent);
-    agents.addAgent(agent2);
-    agents.addAgent(agent1);
-
-    agents.quickSort();
-
-    agents.print();
-
-    // agent.print();
+    tickets.traverse();
 }
