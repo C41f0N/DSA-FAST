@@ -404,13 +404,13 @@ public:
     {
         deleteAll();
 
-        for (int i = 0; i < length; i++)
+        for (int i = length - 1; i >= 0; i--)
         {
             addTicket(array[i]);
         }
     }
 
-    int partition(Ticket *array, int left, int right)
+    int partition(Ticket *array, int left, int right, string sortBy)
     {
 
         Ticket pivot = array[right];
@@ -418,7 +418,23 @@ public:
 
         for (int j = left; j < right; j++)
         {
-            if (array[j].id < pivot.id)
+
+            bool condition = false;
+
+            if (sortBy == "priority")
+            {
+                condition = array[j].priority < pivot.priority;
+            }
+            else if (sortBy == "creationTime")
+            {
+                condition = array[j].creationTime < pivot.creationTime;
+            }
+            else if (sortBy == "customerName")
+            {
+                condition = array[j].customerName < pivot.customerName;
+            }
+
+            if (condition)
             {
                 i++;
                 swap(array[i], array[j]);
@@ -430,29 +446,29 @@ public:
         return i + 1;
     }
 
-    void qs(Ticket *array, int left, int right)
+    void qs(Ticket *array, int left, int right, string sortBy)
     {
         if (left < right)
         {
-            int pi = partition(array, left, right);
-            qs(array, left, pi - 1);
-            qs(array, pi + 1, right);
+            int pi = partition(array, left, right, sortBy);
+            qs(array, left, pi - 1, sortBy);
+            qs(array, pi + 1, right, sortBy);
         }
     }
 
-    void quickSort()
+    void quickSort(string sortBy)
     {
         // Convert LL to Array
         Ticket *tickets = toArray();
         int length = getLength();
 
-        qs(tickets, 0, length - 1);
+        qs(tickets, 0, length - 1, sortBy);
 
         fromArray(tickets, length);
         delete[] tickets;
     }
 
-    void merge(Ticket *tickets, int left, int mid, int right)
+    void merge(Ticket *tickets, int left, int mid, int right, string sortBy)
     {
         if (left == right)
         {
@@ -478,7 +494,23 @@ public:
         int i = 0, j = 0, k = left;
         while (i < n1 && j < n2)
         {
-            if (leftArray[i].id <= rightArray[j].id)
+
+            bool condition = false;
+
+            if (sortBy == "priority")
+            {
+                condition = leftArray[i].priority <= rightArray[j].priority;
+            }
+            else if (sortBy == "creationTime")
+            {
+                condition = leftArray[i].creationTime <= rightArray[j].creationTime;
+            }
+            else if (sortBy == "customerName")
+            {
+                condition = leftArray[i].customerName <= rightArray[j].customerName;
+            }
+
+            if (condition)
             {
                 tickets[k] = leftArray[i];
                 i++;
@@ -511,25 +543,25 @@ public:
         delete[] rightArray;
     }
 
-    void ms(Ticket *tickets, int left, int right)
+    void ms(Ticket *tickets, int left, int right, string sortBy)
     {
         if (left < right)
         {
             int mid = left + (right - left) / 2;
 
-            ms(tickets, left, mid);
-            ms(tickets, mid + 1, right);
-            merge(tickets, left, mid, right);
+            ms(tickets, left, mid, sortBy);
+            ms(tickets, mid + 1, right, sortBy);
+            merge(tickets, left, mid, right, sortBy);
         }
     }
 
-    void mergeSort()
+    void mergeSort(string sortBy)
     {
 
         Ticket *tickets = toArray();
         int length = getLength();
 
-        ms(tickets, 0, length - 1);
+        ms(tickets, 0, length - 1, sortBy);
 
         fromArray(tickets, length);
         delete[] tickets;
@@ -564,7 +596,7 @@ int main()
     ll.addTicket(ticket9);
     ll.addTicket(ticket10);
 
-    // ll.mergeSort();
+    ll.quickSort("creationTime");
 
     // ll.removeTicket(1);
     // ll.removeTicket(2);
