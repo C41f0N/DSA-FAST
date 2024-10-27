@@ -701,6 +701,23 @@ public:
             }
         }
     }
+
+    void insertionSort()
+    {
+        for (int i = 1; i < length; i++)
+        {
+            Agent key = data[i];
+            int j = i;
+
+            while (j > 0 && data[j - 1].numTicketsAssigned > key.numTicketsAssigned)
+            {
+                data[j] = data[j - 1];
+                j--;
+            }
+
+            data[j] = key;
+        }
+    }
 };
 
 int main()
@@ -746,7 +763,7 @@ int main()
     agents.addAgent(agent2);
     agents.addAgent(agent1);
 
-    agents.selectionSort();
+    agents.insertionSort();
 
     agents.print();
 
