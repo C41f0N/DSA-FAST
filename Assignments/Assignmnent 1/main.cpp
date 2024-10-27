@@ -1109,7 +1109,7 @@ public:
     ResolutionLogsStack resolvedTickets;
     PendingTicketsQueue pendingTickets;
 
-    // Function that assigns all unassigned tickets to agents
+    // Function that assigns the most urgent ticket to an agent
     void assignTicket()
     {
         // get a pending ticket
@@ -1133,6 +1133,7 @@ public:
         cout << "[-] No free agents, can't assign ticket." << endl;
     }
 
+    // Function that resolves tickets every time its called
     void resolveTicket()
     {
         Ticket *resolvedTicket = agents.resolveTicket();
@@ -1158,10 +1159,88 @@ public:
         return newTicket->id;
     }
 
+    // Function to add a new agent to the system
     void addNewAgent(string name, string type)
     {
         Agent *newAgent = new Agent(name, type);
         agents.addAgent(newAgent);
+    }
+
+    void searchTicketByID(int id)
+    {
+        Ticket *ticket = allTickets.getTicketById(id);
+
+        if (ticket)
+        {
+            cout << "[+] Here is your ticket." << endl;
+
+            ticket->print();
+        }
+    }
+
+    void searchTicketByName(string customerName)
+    {
+        Ticket *ticket = allTickets.getTicketByCustomerName(customerName);
+
+        if (ticket)
+        {
+            cout << "[+] Here is your ticket." << endl;
+
+            ticket->print();
+        }
+    }
+
+    void displayAllTickets()
+    {
+        cout << "======================================" << endl;
+        cout << "      Displaying All Tickets" << endl;
+        cout << "======================================" << endl;
+
+        allTickets.traverse();
+    }
+
+    void displayAllOpenTickets()
+    {
+        cout << "======================================" << endl;
+        cout << "      Displaying All Open Tickets" << endl;
+        cout << "======================================" << endl;
+
+        allTickets.displayOpenTickets();
+    }
+
+    void displayAllClosedTickets()
+    {
+        cout << "======================================" << endl;
+        cout << "    Displaying All Closed Tickets" << endl;
+        cout << "======================================" << endl;
+
+        allTickets.displayClosedTickets();
+    }
+
+    void sortTickets(string sortBy)
+    {
+        string defaultSortAlg = "bubble";
+
+        if (defaultSortAlg == "bubble")
+        {
+            allTickets.bubbleSort(sortBy);
+        }
+        else if (defaultSortAlg == "insertion")
+        {
+            allTickets.insertionSort(sortBy);
+        }
+        else if (defaultSortAlg == "selection")
+        {
+            allTickets.selectionSort(sortBy);
+        }
+        else if (defaultSortAlg == "quick")
+        {
+            allTickets.quickSort(sortBy);
+        }
+        else if (defaultSortAlg == "merge")
+        {
+            allTickets.mergeSort(sortBy);
+        }
     }
 };
 
