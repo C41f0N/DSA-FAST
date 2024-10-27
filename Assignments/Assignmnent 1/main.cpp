@@ -648,7 +648,7 @@ public:
         }
     }
 
-    void assignTicket(Ticket *ticket)
+    void assignTickets(Ticket *ticket)
     {
         if (available)
         {
@@ -735,13 +735,13 @@ public:
         data[length - 1] = agent;
     }
 
-    bool assignTicket(Ticket *ticket)
+    bool assignTickets(Ticket *ticket)
     {
         for (int i = 0; i < length; i++)
         {
             if (data[i]->available && data[i]->type == ticket->requestDescription)
             {
-                data[i]->assignTicket(ticket);
+                data[i]->assignTickets(ticket);
                 return true;
             }
         }
@@ -1033,9 +1033,42 @@ public:
             return;
         }
 
-        front->next = newNode;
-        newNode->prev = front;
-        front = newNode;
+        // Enqueing According to order of queue
+        TicketNode *current = back;
+
+        while (current != NULL && current->ticket->priority < ticket->priority)
+        {
+            current = current->next;
+        }
+
+        if (current == NULL)
+        {
+            front->next = newNode;
+            newNode->prev = front;
+            front = newNode;
+
+            return;
+        }
+
+        if (current == back)
+        {
+            newNode->next = back;
+            back->prev = newNode;
+
+            back = newNode;
+
+            return;
+        }
+
+        TicketNode *currentPrev = current->prev;
+
+        currentPrev->next = newNode;
+        newNode->prev = currentPrev;
+
+        current->prev = newNode;
+        newNode->next = current;
+
+        return;
     }
 
     Ticket *dequeueTicket()
@@ -1045,7 +1078,7 @@ public:
             return NULL;
         }
 
-        Ticket *removedTicket = back->ticket;
+        Ticket *removedTicket = front->ticket;
 
         // If last element
         if (front == back)
@@ -1054,8 +1087,8 @@ public:
         }
         else
         {
-            back = back->next;
-            back->prev = NULL;
+            front = front->prev;
+            front->next = NULL;
         }
 
         return removedTicket;
@@ -1066,12 +1099,12 @@ public:
         cout << "================================" << endl;
         cout << "     PENDING TICKETS QUEUE" << endl;
         cout << "================================" << endl;
-        TicketNode *current = back;
+        TicketNode *current = front;
 
         while (current != NULL)
         {
             current->ticket->print();
-            current = current->next;
+            current = current->prev;
         }
     }
 
@@ -1113,7 +1146,7 @@ public:
     PendingTicketsQueue pendingTicketsAcademics;
 
     // Function that assigns the most urgent ticket from each type to available agents
-    void assignTicket()
+    void assignTickets()
     {
         // Assigning from IT
         Ticket *pendingTicket = pendingTicketsIT.peekBack();
@@ -1125,7 +1158,7 @@ public:
         else
         {
 
-            bool successfullyAssigned = agents.assignTicket(pendingTicket);
+            bool successfullyAssigned = agents.assignTickets(pendingTicket);
 
             if (successfullyAssigned)
             {
@@ -1139,7 +1172,7 @@ public:
         }
 
         // Assigning from Admin
-        Ticket *pendingTicket = pendingTicketsAdmin.peekBack();
+        pendingTicket = pendingTicketsAdmin.peekBack();
 
         if (pendingTicket == NULL)
         {
@@ -1148,7 +1181,7 @@ public:
         else
         {
 
-            bool successfullyAssigned = agents.assignTicket(pendingTicket);
+            bool successfullyAssigned = agents.assignTickets(pendingTicket);
 
             if (successfullyAssigned)
             {
@@ -1161,7 +1194,7 @@ public:
         }
 
         // Assigning from Accounts
-        Ticket *pendingTicket = pendingTicketsAccounts.peekBack();
+        pendingTicket = pendingTicketsAccounts.peekBack();
 
         if (pendingTicket == NULL)
         {
@@ -1170,7 +1203,7 @@ public:
         else
         {
 
-            bool successfullyAssigned = agents.assignTicket(pendingTicket);
+            bool successfullyAssigned = agents.assignTickets(pendingTicket);
 
             if (successfullyAssigned)
             {
@@ -1183,7 +1216,7 @@ public:
         }
 
         // Assigning from Academics
-        Ticket *pendingTicket = pendingTicketsAcademics.peekBack();
+        pendingTicket = pendingTicketsAcademics.peekBack();
 
         if (pendingTicket == NULL)
         {
@@ -1192,7 +1225,7 @@ public:
         else
         {
 
-            bool successfullyAssigned = agents.assignTicket(pendingTicket);
+            bool successfullyAssigned = agents.assignTickets(pendingTicket);
 
             if (successfullyAssigned)
             {
@@ -1336,34 +1369,6 @@ int main()
 {
     OneStopTicketManagement tm;
 
-    tm.addNewTicket("Moosa", 1, "IT");
-    tm.addNewTicket("Sarim", 1, "A request");
-    tm.addNewTicket("Shaheer", 1, "A request");
-    tm.addNewTicket("Saqib", 1, "A request");
-    tm.addNewTicket("Rafay", 1, "A request");
-    tm.addNewTicket("Abdullah", 1, "A request");
-    tm.addNewAgent("Haris", "IT");
-    tm.addNewAgent("Sohaib", "IT");
-
-    // tm.pendingTickets.displayQueue();
-    // tm.resolvedTickets.seeRecentlyResolvedTickets();
-
-    tm.assignTicket();
-    tm.assignTicket();
-    tm.assignTicket();
-    tm.assignTicket();
-    tm.assignTicket();
-    tm.assignTicket();
-    tm.assignTicket();
-
-    tm.resolveTicket();
-    tm.resolveTicket();
-    tm.resolveTicket();
-    tm.resolveTicket();
-    tm.resolveTicket();
-    tm.resolveTicket();
-    tm.resolveTicket();
-
-    // tm.pendingTickets.displayQueue();
-    // tm.resolvedTickets.seeRecentlyResolvedTickets();
+    tm.configuration;
+    tm.configuration.display();
 }
