@@ -104,6 +104,34 @@ public:
         }
     }
 
+    void displayOpenTickets()
+    {
+        TicketNode *temp = head;
+
+        while (temp != NULL)
+        {
+            if (temp->ticket->isOpen)
+            {
+                temp->ticket->print();
+            }
+            temp = temp->next;
+        }
+    }
+
+    void displayClosedTickets()
+    {
+        TicketNode *temp = head;
+
+        while (temp != NULL)
+        {
+            if (!temp->ticket->isOpen)
+            {
+                temp->ticket->print();
+            }
+            temp = temp->next;
+        }
+    }
+
     // Add at start
     void addTicket(Ticket *ticket)
     {
@@ -928,6 +956,7 @@ public:
         }
 
         front->next = newNode;
+        newNode->prev = front;
         front = newNode;
     }
 
@@ -948,9 +977,21 @@ public:
         else
         {
             back = back->next;
+            back->prev = NULL;
         }
 
         return removedTicket;
+    }
+
+    void displayQueue()
+    {
+        TicketNode *current = front;
+
+        while (current != NULL)
+        {
+            current->ticket->print();
+            current = current->prev;
+        }
     }
 };
 
@@ -966,15 +1007,4 @@ int main()
     Ticket *ticket8 = new Ticket(1, "S2arim Ahmed", 1, "A request");
     Ticket *ticket9 = new Ticket(8, "S4arim Ahmed", 1, "A request");
     Ticket *ticket10 = new Ticket(1, "S2arim Ahmed", 1, "A request");
-
-    TicketLL tickets;
-
-    tickets.addTicket(ticket10);
-    tickets.addTicket(ticket1);
-    tickets.addTicket(ticket2);
-    tickets.addTicket(ticket3);
-
-    tickets.bubbleSort("priority");
-
-    tickets.traverse();
 }
