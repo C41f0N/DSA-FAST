@@ -852,6 +852,50 @@ public:
     }
 };
 
+class TicketResolutionNode
+{
+public:
+    Ticket *ticket;
+    TicketResolutionNode *next;
+    chrono::_V2::system_clock::time_point closeTime;
+
+    TicketResolutionNode(
+        Ticket *ticket)
+        : ticket(ticket),
+          next(NULL),
+          closeTime(ticket->closeTime) {}
+};
+
+class ResolutionLogsStack
+{
+    TicketResolutionNode *top;
+
+public:
+    void addTicket(Ticket *ticket)
+    {
+        if (ticket->isOpen)
+        {
+            cout << "[-] Cannot add to resolution stack, ticket is open." << endl;
+            return;
+        }
+
+        TicketResolutionNode *newNode = new TicketResolutionNode(ticket);
+
+        if (top == NULL)
+        {
+            top = newNode;
+            return;
+        }
+
+        newNode->next = top;
+        top = newNode;
+    }
+
+    TicketResolutionNode *peek()
+    {
+        return top;
+    }
+};
 int main()
 {
     Ticket ticket1(2, "S1arim Ahmed", 1, "A request");
