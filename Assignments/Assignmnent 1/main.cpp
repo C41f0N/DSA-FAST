@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <chrono>
+#include <fstream>
 
 using namespace std;
 using namespace chrono;
@@ -1133,6 +1134,66 @@ public:
     }
 };
 
+class Configuration
+{
+public:
+    string sortHigh;
+    string sortLow;
+    int threshold;
+
+    Configuration()
+    {
+        // Load data from file
+        loadFromFile();
+    }
+
+    void display()
+    {
+        cout << "=========================================" << endl;
+        cout << "    DISPLAYING SORTING CONFIGURATION" << endl;
+        cout << "=========================================" << endl;
+
+        cout << "Above Threshold Sort: " << sortHigh << endl;
+        cout << "Below Threshold Sort: " << sortLow << endl;
+        cout << "Threshold: " << threshold << endl;
+    }
+
+    void setDefaultData()
+    {
+        sortHigh = "quick";
+        sortLow = "insertion";
+        threshold = 10;
+    }
+
+    void writeToFile()
+    {
+        ofstream configFile("oneStop.conf");
+
+        configFile << sortHigh << endl;
+        configFile << sortLow << endl;
+        configFile << threshold << endl;
+    }
+
+    void loadFromFile()
+    {
+        ifstream configFile("oneStop.conf");
+
+        if (!configFile)
+        {
+            setDefaultData();
+            writeToFile();
+            return;
+        }
+
+        string rawThreshold;
+        getline(configFile, sortHigh);
+        getline(configFile, sortLow);
+        getline(configFile, rawThreshold);
+
+        threshold = stoi(rawThreshold);
+    }
+};
+
 class OneStopTicketManagement
 {
 private:
@@ -1140,6 +1201,8 @@ public:
     TicketLL allTickets;
     AgentArray agents;
     ResolutionLogsStack resolvedTickets;
+    Configuration configuration;
+
     PendingTicketsQueue pendingTicketsIT;
     PendingTicketsQueue pendingTicketsAdmin;
     PendingTicketsQueue pendingTicketsAccounts;
