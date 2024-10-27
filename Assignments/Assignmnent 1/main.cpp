@@ -35,7 +35,7 @@ public:
         return system_clock::to_time_t(creationTime);
     }
 
-    void printDetails()
+    void print()
     {
         cout << "Ticket ID: " << id << endl;
         cout << "Customer Name: " << customerName << endl;
@@ -84,7 +84,7 @@ public:
 
         while (temp != NULL)
         {
-            temp->ticket.printDetails();
+            temp->ticket.print();
             temp = temp->next;
         }
     }
@@ -568,6 +568,93 @@ public:
     }
 };
 
+class Agent
+{
+public:
+    int id;
+    string name;
+    int numTicketsAssigned;
+    Ticket *assignedTickets[5];
+    bool available;
+
+    Agent() {}
+
+    Agent(
+        int id,
+        string name)
+        : id(id),
+          name(name),
+          numTicketsAssigned(0),
+          available(true) {}
+
+    void print()
+    {
+        cout << "Agent ID: " << id << endl;
+        cout << "Agent Name: " << name << endl;
+        cout << "Total Tickets Assigned: " << numTicketsAssigned << endl
+             << endl;
+        for (int i = 0; i < numTicketsAssigned; i++)
+        {
+            cout << "Ticket#" << i << endl;
+            assignedTickets[i]->print();
+        }
+    }
+
+    void assignTicket(Ticket *ticket)
+    {
+        if (numTicketsAssigned < 5)
+        {
+            assignedTickets[numTicketsAssigned] = ticket;
+            numTicketsAssigned++;
+
+            if (numTicketsAssigned >= 5)
+            {
+                available = false;
+            }
+        }
+    }
+};
+
+class AgentArray
+{
+public:
+    Agent *data;
+    int capacity;
+    int length;
+
+    AgentArray()
+        : capacity(1),
+          length(0)
+    {
+        data = new Agent[capacity];
+    }
+
+    void addAgent(Agent agent)
+    {
+
+        length++;
+
+        if (length > capacity)
+        {
+            // Update array capacity
+            capacity *= 2;
+
+            Agent *newData = new Agent[capacity];
+
+            // Copy old data
+            for (int i = 0; i < length - 1; i++)
+            {
+                newData[i] = data[i];
+            }
+
+            delete[] data;
+            data = newData;
+        }
+
+        data[length - 1] = agent;
+    }
+};
+
 int main()
 {
     Ticket ticket1(2, "S1arim Ahmed", 1, "A request");
@@ -581,27 +668,19 @@ int main()
     Ticket ticket9(8, "S4arim Ahmed", 1, "A request");
     Ticket ticket10(1, "S2arim Ahmed", 1, "A request");
 
-    TicketLL ll;
+    Agent agent(21, "Sarim");
+    Agent agent1(21, "Sarim");
+    Agent agent2(21, "Sarim");
 
-    ticket4.close();
+    AgentArray agents;
 
-    ll.addTicket(ticket1);
-    ll.addTicket(ticket2);
-    ll.addTicket(ticket3);
-    ll.addTicket(ticket4);
-    ll.addTicket(ticket5);
-    ll.addTicket(ticket6);
-    ll.addTicket(ticket7);
-    ll.addTicket(ticket8);
-    ll.addTicket(ticket9);
-    ll.addTicket(ticket10);
+    agents.addAgent(agent);
+    agents.addAgent(agent1);
+    agents.addAgent(agent2);
+    agents.addAgent(agent2);
+    agents.addAgent(agent2);
 
-    ll.quickSort("creationTime");
+    cout << agents.length << endl;
 
-    // ll.removeTicket(1);
-    // ll.removeTicket(2);
-    // ll.removeTicket(4);
-    // ll.removeTicket(8);
-
-    ll.traverse();
+    // agent.print();
 }
