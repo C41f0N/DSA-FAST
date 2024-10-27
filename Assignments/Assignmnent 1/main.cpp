@@ -29,7 +29,7 @@ public:
           creationTime(chrono::system_clock::now()),
           isOpen(true)
     {
-        id = rand() % 10000;
+        id = rand() % 1000000;
     }
 
     time_t getTime()
@@ -39,6 +39,9 @@ public:
 
     void print()
     {
+        cout << "====================" << endl;
+        cout << "    TICKET INFO" << endl;
+        cout << "====================" << endl;
         cout << "Ticket ID: " << id << endl;
         cout << "Priority: " << priority << endl;
         cout << "Customer Name: " << customerName << endl;
@@ -617,18 +620,21 @@ public:
           numTicketsAssigned(0),
           available(true)
     {
-        id = rand() % 10000;
+        id = rand() % 1000000;
     }
 
     void print()
     {
-        cout << "Agent ID: " << id << endl;
-        cout << "Agent Name: " << name << endl;
-        cout << "Total Tickets Assigned: " << numTicketsAssigned << endl
+        cout << "========================" << endl;
+        cout << "   AGENT DESCRIPTION" << endl;
+        cout << "========================" << endl;
+        cout << "ID: " << id << endl;
+        cout << "Name: " << name << endl;
+        cout << "Total Tickets Assigned: " << numTicketsAssigned
              << endl;
         for (int i = 0; i < numTicketsAssigned; i++)
         {
-            cout << "Ticket#" << i << endl;
+            cout << "--> Ticket " << i + 1 << ":" << endl;
             assignedTickets[i]->print();
         }
     }
@@ -720,15 +726,30 @@ public:
         data[length - 1] = agent;
     }
 
+    // Assigning ticket to the agent that has the lowest workload
     bool assignTickets(Ticket *ticket)
     {
+
+        int mostFree = -1;
         for (int i = 0; i < length; i++)
         {
             if (data[i]->available && data[i]->type == ticket->requestDescription)
             {
-                data[i]->assignTickets(ticket);
-                return true;
+                if (mostFree == -1)
+                {
+                    mostFree = i;
+                }
+                else if (data[i]->numTicketsAssigned < data[mostFree]->numTicketsAssigned)
+                {
+                    mostFree = i;
+                }
             }
+        }
+
+        if (mostFree != -1)
+        {
+            data[mostFree]->assignTickets(ticket);
+            return true;
         }
 
         return false;
@@ -942,7 +963,7 @@ class ResolutionLogsStack
 public:
     ResolutionLogsStack() : top(NULL) {}
 
-    void seeRecentlyResolvedTickets()
+    void print()
     {
         cout << "===============================" << endl;
         cout << "      RESOLVED TICKETS" << endl;
@@ -1210,17 +1231,302 @@ public:
     PendingTicketsQueue pendingTicketsAccounts;
     PendingTicketsQueue pendingTicketsAcademics;
 
+    void run()
+    {
+        bool running = true;
+        int option;
+
+        while (running)
+        {
+            // Main Menu
+            cout << "========================================" << endl;
+            cout << "   ONE STOP TICKET MANAGEMENT SYSTEM" << endl;
+            cout << "========================================" << endl;
+            cout << endl;
+            cout << "[0] Quit" << endl;
+            cout << "[1] Admin Menu" << endl;
+            cout << "[2] User Menu" << endl;
+            cout << endl;
+            cout << "Your option: ";
+
+            cin >> option;
+
+            string agentName, agentType, inputStr, customerNameInput, ticketDetailsInput;
+            int inputInt;
+
+            switch (option)
+            {
+            case 0:
+                // Exit
+                running = false;
+                break;
+
+            case 1:;
+                // Admin Menu
+                cout << "==============================" << endl;
+                cout << "        ADMIN MENU" << endl;
+                cout << "==============================" << endl;
+                cout << "[0] Quit" << endl;
+                cout << "[1] Add Agent" << endl;
+                cout << "[2] Assign Tickets" << endl;
+                cout << "[3] Resolve a Ticket" << endl;
+                cout << "[4] Print Tickets (Open/Closed)" << endl;
+                cout << "[5] Print Config" << endl;
+                cout << "[6] Change Config" << endl;
+                cout << "[7] Search Ticket with Report" << endl;
+                cout << endl;
+                cout << "Your option: ";
+
+                cin >> option;
+
+                switch (option)
+                {
+                case 0:
+                    // exit
+                    running = false;
+                    break;
+
+                case 1:
+                    // Add Agent
+                    cout << "-> Enter the agent's name: ";
+                    cin >> agentName;
+
+                    cout << "-> Enter the agent's type (IT, Admin, Accounts, Academics) :";
+                    cin >> agentType;
+
+                    addNewAgent(agentName, agentType);
+
+                    cout << "[+] Agent added." << endl;
+                    char c;
+                    cout << "Press any key to continue...";
+                    getchar();
+                    getchar();
+                    cout << endl;
+                    break;
+
+                case 2:
+                    // Assign Tickets
+                    assignTickets();
+
+                    cout << "[+] Assigned tickets to available agents." << endl;
+                    cout << "Press any key to continue...";
+                    getchar();
+                    getchar();
+                    cout << endl;
+                    break;
+
+                case 3:
+                    // Resolve Ticket
+                    resolveTicket();
+
+                    cout << "[+] Resolved a ticket which was assigned to an agent." << endl;
+                    cout << "Press any key to continue...";
+                    getchar();
+                    getchar();
+                    cout << endl;
+                    break;
+
+                case 4:
+                    cout << "[0] Quit" << endl;
+                    cout << "[1] Show Open Tickets" << endl;
+                    cout << "[2] Show Closed Tickets" << endl;
+                    cout << "[3] Show All Tickets" << endl;
+
+                    cout << endl;
+                    cout << "Your option: ";
+                    cin >> option;
+
+                    switch (option)
+                    {
+                    case 0:
+                        running = false;
+                        break;
+
+                    case 1:
+                        allTickets.displayOpenTickets();
+                        break;
+
+                    case 2:
+                        allTickets.displayClosedTickets();
+                        break;
+
+                    case 3:
+                        allTickets.traverse();
+                        break;
+
+                    default:
+                        break;
+                    }
+                    cout << "Press any key to continue...";
+                    getchar();
+                    getchar();
+                    cout << endl;
+                    break;
+                    break;
+
+                case 5:
+                    configuration.display();
+                    break;
+
+                case 6:
+                    cout << "[0] Quit" << endl;
+                    cout << "[1] Set Threshold" << endl;
+                    cout << "[2] Set High Sorting Algorithm" << endl;
+                    cout << "[3] Set Low Sorting Algorithm" << endl;
+                    cout << endl;
+                    cout << "Your option: ";
+                    cin >> option;
+
+                    switch (option)
+                    {
+                    case 0:
+                        running = false;
+                        break;
+
+                    case 1:
+                        cout << "-> Enter new threshold: ";
+                        cin >> inputInt;
+
+                        configuration.setThreshold(inputInt);
+                        break;
+
+                    case 2:
+                        cout << " - bubble" << endl;
+                        cout << " - insertion" << endl;
+                        cout << " - selection" << endl;
+                        cout << " - quick" << endl;
+                        cout << " - merge" << endl;
+                        cout << " -> Enter one of the above: ";
+                        cin >> inputStr;
+
+                        configuration.setSortHigh(inputStr);
+                        break;
+
+                    case 3:
+                        cout << " - bubble" << endl;
+                        cout << " - insertion" << endl;
+                        cout << " - selection" << endl;
+                        cout << " - quick" << endl;
+                        cout << " - merge" << endl;
+                        cout << " -> Enter one of the above: ";
+                        cin >> inputStr;
+
+                        configuration.setSortLow(inputStr);
+                        break;
+
+                    default:
+                        break;
+                    }
+
+                    break;
+
+                case 7:
+                    cout << "What do you want to search by?" << endl;
+                    cout << "[0] ID" << endl;
+                    cout << "[1] Customer Name" << endl;
+                    cout << endl;
+                    cout << "Your option: " << endl;
+
+                    cin >> option;
+
+                    if (!option)
+                    {
+                        cout << "Enter ID: ";
+                        cin >> inputInt;
+
+                        searchTicketByID(inputInt);
+                    }
+                    else
+                    {
+                        cout << "Enter Customer Name: ";
+                        cin >> inputStr;
+
+                        searchTicketByName(inputStr);
+                    }
+
+                    break;
+
+                default:
+                    break;
+                }
+
+                break;
+            case 2:
+                // User Menu
+                cout << "[0] Quit" << endl;
+                cout << "[1] Add Ticket" << endl;
+                cout << "[2] Search Ticket" << endl;
+                cout << endl;
+                cout << "Your option: ";
+
+                cin >> option;
+
+                switch (option)
+                {
+                case 0:
+                    running = false;
+                    break;
+                case 1:
+
+                    cout << "-> Enter Customer Name: ";
+                    cin >> customerNameInput;
+
+                    cout << "-> Enter Ticket Priority: ";
+                    cin >> inputInt;
+
+                    cout << "-> Enter ticket type/description (IT, Admin, Accounts, Academics): ";
+                    cin >> ticketDetailsInput;
+
+                    inputInt = addNewTicket(customerNameInput, inputInt, ticketDetailsInput);
+                    cout << "[+] Ticket Successfully added." << endl;
+                    cout << "[+] Your Ticket ID: " << inputInt << endl;
+
+                    break;
+                case 2:
+                    cout << "What do you want to search by?" << endl;
+                    cout << "[0] ID" << endl;
+                    cout << "[1] Customer Name" << endl;
+                    cout << endl;
+                    cout << "Your option: " << endl;
+
+                    cin >> option;
+
+                    if (!option)
+                    {
+                        cout << "Enter ID: ";
+                        cin >> inputInt;
+
+                        searchTicketByID(inputInt);
+                    }
+                    else
+                    {
+                        cout << "Enter Customer Name: ";
+                        cin >> inputStr;
+
+                        searchTicketByName(inputStr);
+                    }
+
+                    break;
+                default:
+                    break;
+                }
+
+                break;
+
+            default:
+                break;
+            }
+        }
+    }
+
     // Function that assigns the most urgent ticket from each type to available agents
     void assignTickets()
     {
         // Assigning from IT
-        Ticket *pendingTicket = pendingTicketsIT.peekBack();
+        Ticket *pendingTicket = pendingTicketsIT.peekFront();
 
-        if (pendingTicket == NULL)
-        {
-            cout << "[+] No pending IT tickets." << endl;
-        }
-        else
+        if (pendingTicket != NULL)
+
         {
 
             bool successfullyAssigned = agents.assignTickets(pendingTicket);
@@ -1237,13 +1543,10 @@ public:
         }
 
         // Assigning from Admin
-        pendingTicket = pendingTicketsAdmin.peekBack();
+        pendingTicket = pendingTicketsAdmin.peekFront();
 
-        if (pendingTicket == NULL)
-        {
-            cout << "[+] No pending Admin tickets." << endl;
-        }
-        else
+        if (pendingTicket != NULL)
+
         {
 
             bool successfullyAssigned = agents.assignTickets(pendingTicket);
@@ -1259,13 +1562,10 @@ public:
         }
 
         // Assigning from Accounts
-        pendingTicket = pendingTicketsAccounts.peekBack();
+        pendingTicket = pendingTicketsAccounts.peekFront();
 
-        if (pendingTicket == NULL)
-        {
-            cout << "[+] No pending Accounts tickets." << endl;
-        }
-        else
+        if (pendingTicket != NULL)
+
         {
 
             bool successfullyAssigned = agents.assignTickets(pendingTicket);
@@ -1281,13 +1581,10 @@ public:
         }
 
         // Assigning from Academics
-        pendingTicket = pendingTicketsAcademics.peekBack();
+        pendingTicket = pendingTicketsAcademics.peekFront();
 
-        if (pendingTicket == NULL)
-        {
-            cout << "[+] No pending Academics tickets." << endl;
-        }
-        else
+        if (pendingTicket != NULL)
+
         {
 
             bool successfullyAssigned = agents.assignTickets(pendingTicket);
@@ -1441,8 +1738,11 @@ public:
 
 int main()
 {
+    srand(time(NULL));
+
     OneStopTicketManagement tm;
 
-    tm.configuration;
-    tm.configuration.display();
+    tm.run();
+
+    exit(0);
 }
