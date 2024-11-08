@@ -1,63 +1,77 @@
-#include <bits/stdc++.h>
+#include <iostream>
+
 using namespace std;
 
-int partition(vector<int> &arr, int low, int high)
+void swap(int &a, int &b)
 {
-    int pivot = arr[low];
-    int i = low;
-    int j = high;
+    int temp = a;
+    a = b;
+    b = temp;
+}
 
-    while (i < j)
+int partition(int array[], int left, int right)
+{
+    if (left == right)
     {
-        while (arr[i] <= pivot && i <= high - 1)
+        return left;
+    }
+
+    int pivot = right;
+
+    int i = left - 1;
+
+    for (int j = left; j < right; j++)
+    {
+        if (array[j] < array[pivot])
         {
             i++;
+            swap(array[i], array[j]);
         }
-
-        while (arr[j] > pivot && j >= low + 1)
-        {
-            j--;
-        }
-        if (i < j)
-            swap(arr[i], arr[j]);
     }
-    swap(arr[low], arr[j]);
-    return j;
+
+    swap(array[pivot], array[i + 1]);
+
+    return i + 1;
 }
 
-void qs(vector<int> &arr, int low, int high)
+void qs(int array[], int left, int right)
 {
-    if (low < high)
+    if (left < right)
     {
-        int pIndex = partition(arr, low, high);
-        qs(arr, low, pIndex - 1);
-        qs(arr, pIndex + 1, high);
+        int pi = partition(array, left, right);
+
+        qs(array, left, pi - 1);
+        qs(array, pi + 1, right);
     }
 }
 
-vector<int> quickSort(vector<int> arr)
+void quickSort(int array[], int length)
 {
-    qs(arr, 0, arr.size() - 1);
-    return arr;
+    qs(array, 0, length - 1);
 }
 
 int main()
 {
-    vector<int> arr = {4, 6, 2, 5, 7, 9, 1, 3};
-    int n = arr.size();
-    cout << "Before Using quick Sort: " << endl;
-    for (int i = 0; i < n; i++)
+    int array[] = {
+        10,
+        6,
+        9,
+        8,
+        3,
+        5,
+        14,
+        7,
+        2,
+        1,
+    };
+
+    int length = sizeof(array) / sizeof(array[0]);
+
+    quickSort(array, length);
+
+    for (int i = 0; i < length; i++)
     {
-        cout << arr[i] << " ";
+        cout << array[i] << " ";
     }
     cout << endl;
-
-    arr = quickSort(arr);
-    cout << "After Using quick sort: " << "\n";
-    for (int i = 0; i < n; i++)
-    {
-        cout << arr[i] << " ";
-    }
-    cout << "\n";
-    return 0;
 }
