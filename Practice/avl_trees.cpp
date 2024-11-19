@@ -184,6 +184,32 @@ public:
                 node->right = deleteKey(node->key, node->right);
             }
         }
+
+        int balance = getHeight(node->left) - getHeight(node->right);
+
+        // Rotations
+        if (balance > 1 && key > node->left->key)
+        {
+            return rightRotate(node);
+        }
+
+        if (balance > 1 && key < node->left->key)
+        {
+            node->left = leftRotate(node->left);
+            return rightRotate(node);
+        }
+
+        if (balance < -1 && key > node->right->key)
+        {
+            node->right = rightRotate(node->right);
+            return leftRotate(node);
+        }
+
+        if (balance < -1 && key < node->right->key)
+        {
+            return leftRotate(node);
+        }
+
         return node;
     }
 
@@ -220,6 +246,10 @@ int main()
     t.insertKey(6);
     t.insertKey(7);
     t.insertKey(8);
+
+    t.deleteKey(1);
+    t.deleteKey(2);
+    t.deleteKey(4);
 
     t.inorderTraversal();
 
