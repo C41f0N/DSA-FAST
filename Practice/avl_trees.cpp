@@ -27,6 +27,18 @@ int getHeight(Node *node)
     }
 }
 
+int getBalance(Node *node)
+{
+    if (!node)
+    {
+        return 0;
+    }
+    else
+    {
+        return getHeight(node->left) - getHeight(node->right);
+    }
+}
+
 class AVLTree
 {
 public:
@@ -107,11 +119,20 @@ public:
         return node;
     }
 
-    Node *getMinSuccessor(Node *node)
+    Node *getLeftMost(Node *node)
     {
-        // if (node)
-
-        return temp;
+        if (!node)
+        {
+            return NULL;
+        }
+        else if (!node->left)
+        {
+            return node;
+        }
+        else
+        {
+            return getLeftMost(node->left);
+        }
     }
 
     void insertKey(int key)
@@ -128,11 +149,11 @@ public:
 
         else if (key < node->key)
         {
-            deleteKey(key, node->left);
+            node->left = deleteKey(key, node->left);
         }
         else if (key > node->key)
         {
-            deleteKey(key, node->right);
+            node->right = deleteKey(key, node->right);
         }
         else
         {
@@ -156,14 +177,34 @@ public:
             else
             {
                 // Get min successor
-                Node *minSuccessor = getMinSuccessor(node);
+                Node *minSuccessor = getLeftMost(node->right);
 
                 node->key = minSuccessor->key;
 
-                delete minSuccessor;
-                return node;
+                node->right = deleteKey(node->key, node->right);
             }
         }
+        return node;
+    }
+
+    void deleteKey(int key)
+    {
+        root = deleteKey(key, root);
+    }
+
+    void inorderTraversal(Node *node)
+    {
+        if (node)
+        {
+            inorderTraversal(node->left);
+            cout << node->key << endl;
+            inorderTraversal(node->right);
+        }
+    }
+
+    void inorderTraversal()
+    {
+        inorderTraversal(root);
     }
 };
 
@@ -180,5 +221,8 @@ int main()
     t.insertKey(7);
     t.insertKey(8);
 
-    cout << t.root->left->height - t.root->right->height << endl;
+    t.inorderTraversal();
+
+    cout << "balance: ";
+    cout << getBalance(t.root) << endl;
 }
