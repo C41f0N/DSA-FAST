@@ -1,5 +1,6 @@
 #include <iostream>
 #include <bits/stdc++.h>
+#include <sys/resource.h>
 
 using namespace std;
 
@@ -51,7 +52,7 @@ public:
         }
         else
         {
-            if (id < node->data->id)
+            if (id > node->data->id)
             {
                 node->right = insertData(id, name, age, node->right);
             }
@@ -145,13 +146,13 @@ public:
         root = deleteData(id, root);
     }
 
-    BSTNode *searchData(int id, BSTNode *root)
+    TableData *searchData(int id, BSTNode *root)
     {
         if (root != NULL)
         {
             if (root->data->id == id)
             {
-                return root;
+                return root->data;
             }
             else if (id > root->data->id)
             {
@@ -168,7 +169,7 @@ public:
         }
     }
 
-    BSTNode *searchData(int id)
+    TableData *searchData(int id)
     {
         return searchData(id, root);
     }
@@ -374,30 +375,34 @@ public:
                 node->right = deleteData(node->data->id, node->right);
             }
         }
-
+        node->height = 1 + max(getHeight(node->left), getHeight(node->right));
         int balance = getHeight(node->left) - getHeight(node->right);
 
         // Rotations
-        if (balance > 1 && id > node->left->data->id)
+        if (balance > 1)
         {
-            return rightRotate(node);
+            if (getHeight(node->left->left) >= getHeight(node->left->right))
+            {
+                return rightRotate(node);
+            }
+            else
+            {
+                node->left = leftRotate(node->left);
+                return rightRotate(node);
+            }
         }
 
-        if (balance > 1 && id < node->left->data->id)
+        if (balance < -1)
         {
-            node->left = leftRotate(node->left);
-            return rightRotate(node);
-        }
-
-        if (balance < -1 && id > node->right->data->id)
-        {
-            node->right = rightRotate(node->right);
-            return leftRotate(node);
-        }
-
-        if (balance < -1 && id < node->right->data->id)
-        {
-            return leftRotate(node);
+            if (getHeight(node->right->right) >= getHeight(node->right->left))
+            {
+                return leftRotate(node);
+            }
+            else
+            {
+                node->right = rightRotate(node->right);
+                return leftRotate(node);
+            }
         }
 
         return node;
@@ -408,13 +413,13 @@ public:
         root = deleteData(data, root);
     }
 
-    AVLNode *searchData(int id, AVLNode *root)
+    TableData *searchData(int id, AVLNode *root)
     {
         if (root != NULL)
         {
             if (root->data->id == id)
             {
-                return root;
+                return root->data;
             }
             else if (id > root->data->id)
             {
@@ -431,7 +436,7 @@ public:
         }
     }
 
-    AVLNode *searchData(int id)
+    TableData *searchData(int id)
     {
         return searchData(id, root);
     }
@@ -460,6 +465,21 @@ public:
     BTreeNode **children;
     int n;
     bool isLeaf;
+
+    BTreeNode(int minChildrenP, bool isLeafP)
+    {
+        minChildren = minChildrenP;
+        isLeaf = isLeafP;
+        keys = new TableData *[2 * minChildren - 1];
+        children = new BTreeNode *[2 * minChildren];
+        n = 0;
+    }
+
+    ~BTreeNode()
+    {
+        delete keys;
+        delete children;
+    }
 
     int findKey(int id)
     {
@@ -670,15 +690,6 @@ public:
         n = n + 1;
     }
 
-    BTreeNode(int t1, bool leaf1)
-    {
-        minChildren = t1;
-        isLeaf = leaf1;
-        n = 0;
-        keys = new TableData *[2 * minChildren - 1];
-        children = new BTreeNode *[2 * minChildren];
-    }
-
     void traverse()
     {
         int i;
@@ -692,22 +703,22 @@ public:
             children[i]->traverse();
     }
 
-    BTreeNode *searchData(int id)
+    TableData *searchData(int id)
     {
         int i = 0;
-
         while (i < n && id > keys[i]->id)
             i++;
 
-        if (keys[i] && keys[i]->id == id)
+        if (i < n && keys[i]->id == id)
         {
-            return this;
+            return keys[i];
         }
 
         if (isLeaf == true)
         {
             return NULL;
         }
+
         return children[i]->searchData(id);
     }
 };
@@ -718,10 +729,10 @@ public:
     BTreeNode *root;
     int minChildren;
 
-    BTree(int minChildren)
+    BTree(int minChildrenP)
     {
         root = NULL;
-        minChildren = minChildren;
+        minChildren = minChildrenP;
     }
 
     void traverse()
@@ -730,11 +741,11 @@ public:
             root->traverse();
     }
 
-    BTreeNode *searchData(int id)
+    TableData *searchData(int id)
     {
         if (!root)
         {
-            return root;
+            return NULL;
         }
         else
         {
@@ -746,6 +757,7 @@ public:
     {
         if (root == NULL)
         {
+
             root = new BTreeNode(minChildren, true);
             root->keys[0] = new TableData(id, name, age);
             root->n = 1;
@@ -788,18 +800,6 @@ public:
     }
 };
 
-string getRandomString(int n)
-{
-    string s = "";
-
-    for (int i = 0; i < n; i++)
-    {
-        s += (char)((rand() % 26) + 97);
-    }
-
-    return s;
-}
-
 int *getShuffledIds(int n)
 {
     // Initialize
@@ -817,6 +817,18 @@ int *getShuffledIds(int n)
     }
 
     return ids;
+}
+
+string getRandomString(int n)
+{
+    string s = "";
+
+    for (int i = 0; i < n; i++)
+    {
+        s += (char)((rand() % 26) + 97);
+    }
+
+    return s;
 }
 
 string *getRandomNames(int n)
@@ -840,35 +852,147 @@ int *getRandomAges(int n)
     return ages;
 }
 
-int main()
+void runTests(int n)
 {
-    // BST t;
-    AVLTree t;
-    // BTree t(3);
+    BST bst;
+    AVLTree avl;
+    BTree btree(3);
+
+    int bstInsertion;
+    int bstSearching;
+    int bstDeletion;
+
+    int avlInsertion;
+    int avlSearching;
+    int avlDeletion;
+
+    int bTreeInsertion;
+    int bTreeSearching;
+    int bTreeDeletion;
+    clock_t start, end;
 
     srand(time(NULL));
-    int n = 1;
 
     // Generating Data
-    cout << "[+] Generating Data... ";
     int *shuffledIds = getShuffledIds(n);
     string *names = getRandomNames(n);
     int *ages = getRandomAges(n);
-    cout << "Done." << endl;
 
-    cout << "[+] Inserting " << n << " random records in AVL Tree." << endl;
+    // BINARY SEARCH TREE
 
-    // chrono::_V2::system_clock::time_point start = chrono::_V2::system_clock::now();
-    clock_t start = clock();
-
+    // Inserting in BST
+    start = clock();
     for (int i = 0; i < n; i++)
     {
-        // cout << "\r" << i + 1 << "/" << n;
-        t.insertData(shuffledIds[i], names[i], ages[i]);
+        bst.insertData(i, names[i], ages[i]);
+    }
+    end = clock();
+
+    bstInsertion = end - start;
+
+    // Searching Randomly in BST
+    start = clock();
+    for (int i = 0; i < n; i++)
+    {
+        bst.searchData(shuffledIds[i]);
+    }
+    end = clock();
+
+    bstSearching = end - start;
+
+    // Deletion in BST
+    start = clock();
+    for (int i = 0; i < n; i++)
+    {
+        bst.deleteData(shuffledIds[i]);
+    }
+    end = clock();
+    bstDeletion = end - start;
+
+    // AVL TREE
+
+    // Inserting in AVL
+    start = clock();
+    for (int i = 0; i < n; i++)
+    {
+        avl.insertData(i, names[i], ages[i]);
+    }
+    end = clock();
+
+    avlInsertion = end - start;
+
+    // Searching in AVL
+    start = clock();
+    for (int i = 0; i < n; i++)
+    {
+        avl.searchData(shuffledIds[i]);
+    }
+    end = clock();
+
+    avlSearching = end - start;
+
+    // Deletion in AVL
+    start = clock();
+    for (int i = 0; i < n; i++)
+    {
+        avl.deleteData(shuffledIds[i]);
     }
 
-    // chrono::_V2::system_clock::time_point end = chrono::_V2::system_clock::now();
-    clock_t end = clock();
+    end = clock();
+    avlDeletion = end - start;
 
-    cout << "Time Taken (ms): " << end - start << endl;
+    // B TREE
+
+    // Inserting in B TREE
+    start = clock();
+    for (int i = 0; i < n; i++)
+    {
+        btree.insertData(i, names[i], ages[i]);
+    }
+    end = clock();
+
+    bTreeInsertion = end - start;
+
+    // Searching in B TREE
+    start = clock();
+    for (int i = 0; i < n; i++)
+    {
+        btree.searchData(shuffledIds[i]);
+    }
+    end = clock();
+
+    bTreeSearching = end - start;
+
+    // Deletion in B TREE
+    start = clock();
+    for (int i = 0; i < n; i++)
+    {
+        btree.deleteData(shuffledIds[i]);
+    }
+
+    end = clock();
+    bTreeDeletion = end - start;
+
+    // Printing Results
+    cout << "\t\t\tBST(μs)\t\t\tAVL(μs)\t\t\tB-TREES(μs)" << endl;
+    cout << "-----------------------------------------------------------------------------------------" << endl;
+    cout << "Insert\t\t\t" << bstInsertion << "\t\t\t" << avlInsertion << "\t\t\t" << bTreeInsertion << endl;
+    cout << "Search\t\t\t" << bstSearching << "\t\t\t" << avlSearching << "\t\t\t" << bTreeSearching << endl;
+    cout << "Delete\t\t\t" << bstDeletion << "\t\t\t" << avlDeletion << "\t\t\t" << bTreeDeletion << endl;
+}
+
+int main()
+{
+    cout << "> 1000 Records" << endl;
+    runTests(5000);
+
+    cout << endl
+         << endl;
+    cout << "> 5000 Records" << endl;
+    runTests(10000);
+
+    cout << endl
+         << endl;
+    cout << "> 10000 Records" << endl;
+    runTests(20000);
 }
