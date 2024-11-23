@@ -1,4 +1,5 @@
 #include <iostream>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -50,7 +51,7 @@ public:
         }
         else
         {
-            if (id > node->data->id)
+            if (id < node->data->id)
             {
                 node->right = insertData(id, name, age, node->right);
             }
@@ -717,10 +718,10 @@ public:
     BTreeNode *root;
     int minChildren;
 
-    BTree(int _t)
+    BTree(int minChildren)
     {
         root = NULL;
-        minChildren = _t;
+        minChildren = minChildren;
     }
 
     void traverse()
@@ -799,6 +800,25 @@ string getRandomString(int n)
     return s;
 }
 
+int *getShuffledIds(int n)
+{
+    // Initialize
+    int *ids = new int[n];
+
+    for (int i = 0; i < n; i++)
+    {
+        ids[i] = i;
+    }
+
+    // Shuffling IDs
+    for (int i = 0; i < n / 2; i++)
+    {
+        swap(ids[rand() % n], ids[rand() % n]);
+    }
+
+    return ids;
+}
+
 string *getRandomNames(int n)
 {
     string *names = new string[n];
@@ -822,20 +842,33 @@ int *getRandomAges(int n)
 
 int main()
 {
-    BST t;
+    // BST t;
+    AVLTree t;
+    // BTree t(3);
 
     srand(time(NULL));
-    cout << "Start" << endl;
-    int n = 10;
+    int n = 1;
 
+    // Generating Data
+    cout << "[+] Generating Data... ";
+    int *shuffledIds = getShuffledIds(n);
     string *names = getRandomNames(n);
     int *ages = getRandomAges(n);
+    cout << "Done." << endl;
+
+    cout << "[+] Inserting " << n << " random records in AVL Tree." << endl;
+
+    // chrono::_V2::system_clock::time_point start = chrono::_V2::system_clock::now();
+    clock_t start = clock();
 
     for (int i = 0; i < n; i++)
     {
-        t.insertData(i, names[i], ages[i]);
+        // cout << "\r" << i + 1 << "/" << n;
+        t.insertData(shuffledIds[i], names[i], ages[i]);
     }
 
-    cout << "End" << endl;
-    t.inorderTraversal();
+    // chrono::_V2::system_clock::time_point end = chrono::_V2::system_clock::now();
+    clock_t end = clock();
+
+    cout << "Time Taken (ms): " << end - start << endl;
 }
