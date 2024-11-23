@@ -36,13 +36,17 @@ class BST
 public:
     BSTNode *root;
 
-    BSTNode *insertData(int id, string name, int age, BSTNode *root)
+    BST()
     {
-        BSTNode *node = new BSTNode(id, name, age);
+        root = NULL;
+    }
 
-        if (root == NULL)
+    BSTNode *insertData(int id, string name, int age, BSTNode *node)
+    {
+
+        if (node == NULL)
         {
-            root = node;
+            return new BSTNode(id, name, age);
         }
         else
         {
