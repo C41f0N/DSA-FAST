@@ -298,7 +298,7 @@ public:
     {
         if (!root)
         {
-            return root;
+            return NULL;
         }
         else
         {
@@ -354,36 +354,35 @@ public:
 
 int main()
 {
-    BTree minChildren(5);
-    minChildren.insertData(1, "", 1);
-    minChildren.insertData(3, "", 1);
-    minChildren.insertData(7, "", 1);
-    minChildren.insertData(12, "", 1);
-    minChildren.insertData(11, "", 1);
-    minChildren.insertData(13, "", 1);
+    BTree t(5);
 
-    cout << "Traversing B-Tree:" << endl;
-    minChildren.traverse();
-    int id = 10;
-    (minChildren.searchData(id) != NULL) ? cout << endl
-                                                << id << " is found"
-                                         : cout << endl
-                                                << id << " is not Found";
+    for (int i = 0; i < 100000; i++)
+    {
+        t.insertData(i, "", 1);
+    }
+
+    // cout << "Traversing B-Tree:" << endl;
+    // t.traverse();
+    int id = 50000;
+    (t.searchData(id) != NULL) ? cout << endl
+                                      << id << " is found"
+                               : cout << endl
+                                      << id << " is not Found";
 
     id = 12;
-    (minChildren.searchData(id) != NULL) ? cout << endl
-                                                << id << " is found"
-                                         : cout << endl
-                                                << id << " is not Found\n";
+    (t.searchData(id) != NULL) ? cout << endl
+                                      << id << " is found"
+                               : cout << endl
+                                      << id << " is not Found\n";
 
-    minChildren.deleteData(10);
-    minChildren.insertData(10, "", 1);
-    minChildren.deleteData(7);
-    minChildren.insertData(7, "", 1);
-    minChildren.deleteData(5);
-    minChildren.insertData(5, "", 1);
-    minChildren.deleteData(3);
-    minChildren.insertData(3, "", 1);
-    cout << "\nThe B-tree after deleteData of 20: ";
-    minChildren.traverse();
+    t.deleteData(10);
+    t.insertData(10, "", 1);
+    t.deleteData(7);
+    t.insertData(7, "", 1);
+    t.deleteData(5);
+    t.insertData(5, "", 1);
+    t.deleteData(3);
+    t.insertData(3, "", 1);
+    // cout << "\nThe B-tree after deleteData of 20: ";
+    // t.traverse();
 }
