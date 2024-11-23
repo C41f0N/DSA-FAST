@@ -787,26 +787,55 @@ public:
     }
 };
 
-int main()
+string getRandomString(int n)
 {
-    AVLTree t;
+    string s = "";
 
-    t.insertData(1, "", 1);
-    t.insertData(3, "", 1);
-    t.insertData(2, "", 1);
-    t.insertData(5, "", 1);
-    t.insertData(8, "", 1);
-    t.insertData(81, "", 1);
-    t.insertData(4, "", 1);
-    t.insertData(9, "", 1);
-
-    AVLNode *searchResult = t.searchData(9);
-
-    if (searchResult)
+    for (int i = 0; i < n; i++)
     {
-        searchResult->data->print();
+        s += (char)((rand() % 26) + 97);
     }
 
-    cout << endl;
+    return s;
+}
+
+string *getRandomNames(int n)
+{
+    string *names = new string[n];
+
+    for (int i = 0; i < n; i++)
+    {
+        names[i] = getRandomString((rand() % 10) + 3);
+    }
+    return names;
+}
+
+int *getRandomAges(int n)
+{
+    int *ages = new int[n];
+    for (int i = 0; i < n; i++)
+    {
+        ages[i] = (rand() % 50) + 18;
+    }
+    return ages;
+}
+
+int main()
+{
+    BST t;
+
+    srand(time(NULL));
+    cout << "Start" << endl;
+    int n = 10;
+
+    string *names = getRandomNames(n);
+    int *ages = getRandomAges(n);
+
+    for (int i = 0; i < n; i++)
+    {
+        t.insertData(i, names[i], ages[i]);
+    }
+
+    cout << "End" << endl;
     t.inorderTraversal();
 }
