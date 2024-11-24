@@ -856,20 +856,22 @@ void runTests(int n)
 {
     BST bst;
     AVLTree avl;
-    BTree btree(3);
+    BTree btree(10);
 
-    int bstInsertion;
-    int bstSearching;
-    int bstDeletion;
+    chrono::_V2::system_clock::time_point start;
+    chrono::_V2::system_clock::time_point end;
 
-    int avlInsertion;
-    int avlSearching;
-    int avlDeletion;
+    double bstInsertion;
+    double bstSearching;
+    double bstDeletion;
 
-    int bTreeInsertion;
-    int bTreeSearching;
-    int bTreeDeletion;
-    clock_t start, end;
+    double avlInsertion;
+    double avlSearching;
+    double avlDeletion;
+
+    double bTreeInsertion;
+    double bTreeSearching;
+    double bTreeDeletion;
 
     srand(time(NULL));
 
@@ -881,97 +883,97 @@ void runTests(int n)
     // BINARY SEARCH TREE
 
     // Inserting in BST
-    start = clock();
+    start = chrono::high_resolution_clock::now();
     for (int i = 0; i < n; i++)
     {
         bst.insertData(i, names[i], ages[i]);
     }
-    end = clock();
+    end = chrono::high_resolution_clock::now();
 
-    bstInsertion = end - start;
+    bstInsertion = ((double)(chrono::duration_cast<chrono::microseconds>(end - start).count()) / n);
 
     // Searching Randomly in BST
-    start = clock();
+    start = chrono::high_resolution_clock::now();
     for (int i = 0; i < n; i++)
     {
         bst.searchData(shuffledIds[i]);
     }
-    end = clock();
+    end = chrono::high_resolution_clock::now();
 
-    bstSearching = end - start;
+    bstSearching = (double)((double)(chrono::duration_cast<chrono::microseconds>(end - start).count()) / n);
 
     // Deletion in BST
-    start = clock();
+    start = chrono::high_resolution_clock::now();
     for (int i = 0; i < n; i++)
     {
         bst.deleteData(shuffledIds[i]);
     }
-    end = clock();
-    bstDeletion = end - start;
+    end = chrono::high_resolution_clock::now();
+    bstDeletion = ((double)(chrono::duration_cast<chrono::microseconds>(end - start).count()) / n);
 
     // AVL TREE
 
     // Inserting in AVL
-    start = clock();
+    start = chrono::high_resolution_clock::now();
     for (int i = 0; i < n; i++)
     {
         avl.insertData(i, names[i], ages[i]);
     }
-    end = clock();
+    end = chrono::high_resolution_clock::now();
 
-    avlInsertion = end - start;
+    avlInsertion = ((double)(chrono::duration_cast<chrono::microseconds>(end - start).count()) / n);
 
     // Searching in AVL
-    start = clock();
+    start = chrono::high_resolution_clock::now();
     for (int i = 0; i < n; i++)
     {
         avl.searchData(shuffledIds[i]);
     }
-    end = clock();
+    end = chrono::high_resolution_clock::now();
 
-    avlSearching = end - start;
+    avlSearching = ((double)(chrono::duration_cast<chrono::microseconds>(end - start).count()) / n);
 
     // Deletion in AVL
-    start = clock();
+    start = chrono::high_resolution_clock::now();
     for (int i = 0; i < n; i++)
     {
         avl.deleteData(shuffledIds[i]);
     }
 
-    end = clock();
-    avlDeletion = end - start;
+    end = chrono::high_resolution_clock::now();
+    avlDeletion = ((double)(chrono::duration_cast<chrono::microseconds>(end - start).count()) / n);
 
     // B TREE
 
     // Inserting in B TREE
-    start = clock();
+    start = chrono::high_resolution_clock::now();
     for (int i = 0; i < n; i++)
     {
         btree.insertData(i, names[i], ages[i]);
     }
-    end = clock();
+    end = chrono::high_resolution_clock::now();
 
-    bTreeInsertion = end - start;
+    bTreeInsertion = ((double)(chrono::duration_cast<chrono::microseconds>(end - start).count()) / n);
 
     // Searching in B TREE
-    start = clock();
+    start = chrono::high_resolution_clock::now();
     for (int i = 0; i < n; i++)
     {
         btree.searchData(shuffledIds[i]);
     }
-    end = clock();
+    end = chrono::high_resolution_clock::now();
 
-    bTreeSearching = end - start;
+    bTreeSearching = ((double)(chrono::duration_cast<chrono::microseconds>(end - start).count()) / n);
 
     // Deletion in B TREE
-    start = clock();
+    start = chrono::high_resolution_clock::now();
     for (int i = 0; i < n; i++)
     {
         btree.deleteData(shuffledIds[i]);
     }
 
-    end = clock();
-    bTreeDeletion = end - start;
+    end = chrono::high_resolution_clock::now();
+    bTreeDeletion = ((double)(chrono::duration_cast<chrono::microseconds>(end - start).count()) / n);
 
     // Printing Results
     cout << "\t\t\tBST(μs)\t\t\tAVL(μs)\t\t\tB-TREES(μs)" << endl;
@@ -995,4 +997,7 @@ int main()
          << endl;
     cout << "> 10000 Records" << endl;
     runTests(20000);
+
+    cout << endl
+         << endl;
 }
